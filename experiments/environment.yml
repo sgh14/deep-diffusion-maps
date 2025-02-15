@@ -1,4 +1,4 @@
-name: dm_nys
+name: ddm
 dependencies:
   - python == 3.10.12
   - numpy == 1.26.4

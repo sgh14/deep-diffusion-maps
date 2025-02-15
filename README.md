@@ -3,13 +3,23 @@
 
 ## Set up
 
+To install all the dependencies, you can create a conda environment using
+
 ```bash
 conda env create -f experiments/environment.yml
 ```
 
+Additionaly, you may need to install LaTex to create the plots.
+
 ## Usage
 
-To run one the experiments, for example the one for Swiss Roll, execute
+First, activate the environment:
+
+```bash
+conda activate ddm
+```
+
+To run one of the experiments, for example the one for Swiss Roll, execute
 
 ```bash
 python -m experiments.swiss_roll.experiment -c experiments/swiss_roll/config.yml
