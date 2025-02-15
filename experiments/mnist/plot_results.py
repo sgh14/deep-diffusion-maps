@@ -2,6 +2,8 @@ import os
 import h5py
 import numpy as np
 from matplotlib import pyplot as plt
+import argparse
+import yaml
 
 plt.style.use('experiments/science.mplstyle')
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -161,12 +163,27 @@ def plot_history(history, output_dir, filename, log_scale=False):
         
         plt.close(fig)
 
-        
-n_components, q, alpha, steps = 6, 5e-3, 0, 1
-root = '/scratch/sgarcia/ddm/experiments/mnist/results'
+
+
+# Argument Parser
+parser = argparse.ArgumentParser()
+parser.add_argument("-c", "--config", type=str, required=True, help="Path to the YAML configuration file.")
+args = parser.parse_args()
+
+# Load Configuration
+with open(args.config, "r") as file:
+    config = yaml.safe_load(file)
+
+# Extract parameters from config file
+root = config['output_dir']
+n_components = config['diffusion_maps']['n_components']
+q = config['diffusion_maps']['quantile']
+alpha = config['diffusion_maps']['alpha']
+steps = config['diffusion_maps']['steps']
+
+# Create directories
 experiment = f'n_components_{n_components}_q_{q}_alpha_{alpha}_steps_{steps}'
 output_dir = os.path.join(root, experiment)
-os.makedirs(output_dir, exist_ok=True)
 
 with h5py.File(os.path.join(output_dir, 'hist_enc.h5'), 'r') as file:
     history = {key: np.array(file[key]) for key in file.keys()}

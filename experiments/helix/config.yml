@@ -1,0 +1,18 @@
+data:
+  npoints: 2000
+  split: 0.5
+  noise: 0.0
+  seed: 123
+diffusion_maps:
+  n_components: 2
+  quantile: 2.0e-2
+  alpha: 1
+  steps: 100
+encoder:
+  units: 128
+  epochs: 1000
+  batch_size: 64
+  learning_rate: 0.001
+  validation_split: 0.1
+  batch_normalization: True
+output_dir: /scratch/sgarcia/ddm/experiments/helix/results

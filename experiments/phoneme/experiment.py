@@ -2,7 +2,9 @@ import time
 import numpy as np
 import os
 import h5py
-import tensorflow as tf
+import argparse
+import yaml
+from tensorflow.keras.optimizers import Adam
 
 from DiffusionLoss import DiffusionLoss
 from DiffusionMaps import DiffusionMaps
@@ -12,40 +14,70 @@ from experiments.metrics import mae
 from experiments.models import build_seq_encoder
 
 
-root = '/scratch/sgarcia/ddm/experiments/phoneme/results'
-os.makedirs(root, exist_ok=True)
+# Argument Parser
+parser = argparse.ArgumentParser()
+parser.add_argument("-c", "--config", type=str, required=True, help="Path to the YAML configuration file.")
+args = parser.parse_args()
 
-# Get the data
-(X_a, y_a), (X_b, y_b) = get_datasets(split=0.222, seed=123, noise=0)
-X = np.vstack([X_a, X_b])
+# Load Configuration
+with open(args.config, "r") as file:
+    config = yaml.safe_load(file)
 
-# Find optimal values for n_components, q, steps and alpha
-q_vals = np.array([0.005, 0.01, 0.1])
-alpha_vals = np.array([0, 1])
-steps_vals = np.array([2**i for i in range(7)])
-plot_eigenvalues(X_a, q_vals, alpha_vals, steps_vals, root, max_components=25)
-plot_loglikelihood(X_a, q_vals, alpha_vals, steps_vals, root, max_components=25)
-n_components, q, alpha, steps = 2, 5e-3, 0, 1
-# values, counts = np.unique(y_a, return_counts=True)
-sigma = get_sigma(X_a, q) # [y_a == values[np.argmin(counts)]]
-DM = DiffusionMaps(sigma=sigma, n_components=n_components, steps=steps, alpha=alpha)
+# Extract parameters from config file
+root = config['output_dir']
+n_components = config['diffusion_maps']['n_components']
+q = config['diffusion_maps']['quantile']
+alpha = config['diffusion_maps']['alpha']
+steps = config['diffusion_maps']['steps']
 
+# Create directories
 experiment = f'n_components_{n_components}_q_{q}_alpha_{alpha}_steps_{steps}'
 output_dir = os.path.join(root, experiment)
 os.makedirs(output_dir, exist_ok=True)
 
-# Approach 1: original Diffusion Maps
+# Get the data
+(X_a, y_a), (X_b, y_b) = get_datasets(
+    split=config['data']['split'],
+    seed=config['data']['seed'],
+    noise=config['data']['noise']
+)
+X = np.vstack([X_a, X_b])
+
+# Plot eigenvalues and log-likelihood
+plot_eigenvalues(X_a, [q], [alpha], [steps], output_dir, max_components=25)
+plot_loglikelihood(X_a, [q], [alpha], [steps], output_dir, max_components=25)
+
+# Compute sigma and initialize Diffusion Maps
+sigma = get_sigma(X_a, q)
+DM = DiffusionMaps(sigma=sigma, n_components=n_components, steps=steps, alpha=alpha)
+
+# Approach 1: Original Diffusion Maps
 X_red_1 = DM.fit_transform(X)
 X_a_red_1 = X_red_1[:len(X_a)]
 X_b_red_1 = X_red_1[len(X_a):]
 
 # Approach 2: Diffusion Maps with Diffusion Loss
-encoder = build_seq_encoder(input_shape=X_a.shape[1:], units=32, n_components=2, use_bn=False)
+encoder = build_seq_encoder(
+    input_shape=X_a.shape[1:],
+    units=config['encoder']['units'],
+    n_components=n_components,
+    use_bn=config['encoder']['batch_normalization']
+)
 tic = time.perf_counter()
 loss = DiffusionLoss(X_a, sigma=sigma, steps=steps, alpha=alpha)
-encoder.compile(loss=loss, optimizer=tf.keras.optimizers.Adam(learning_rate=0.001))
-indices = np.array(list(range(X_a.shape[0])))
-hist_enc = encoder.fit(x=X_a, y=indices, epochs=100, validation_split=0.1, shuffle=False, batch_size=128, verbose=0)
+optimizer = Adam(learning_rate=config['encoder']['learning_rate'])
+encoder.compile(loss=loss, optimizer=optimizer)
+
+indices = np.arange(X_a.shape[0])
+hist_enc = encoder.fit(
+    x=X_a,
+    y=indices,
+    epochs=config['encoder']['epochs'],
+    validation_split=config['encoder']['validation_split'],
+    shuffle=False,
+    batch_size=config['encoder']['batch_size'],
+    verbose=1
+)
 X_a_red_2 = encoder(X_a)
 tac = time.perf_counter()
 X_b_red_2 = encoder(X_b)
@@ -58,13 +90,12 @@ with h5py.File(os.path.join(output_dir, 'hist_enc.h5'), 'w') as file:
 
 mae_2, mae_2_conf_int = mae(X_b_red_1, X_b_red_2)
 
-# Approach 3: Nyström to extend existing embedding
+# Approach 3: Nyström Extension
 X_a_red_3 = DM.fit_transform(X_a)
 X_b_red_3 = DM.transform(X_b)
 mae_3, mae_3_conf_int = mae(X_b_red_1, X_b_red_3)
 
 with h5py.File(os.path.join(output_dir, 'results.h5'), "w") as file:
-    # Group for hyperparameters
     group_hyperparameters = file.create_group("hyperparameters")
     group_hyperparameters.create_dataset("n_components", data=n_components)
     group_hyperparameters.create_dataset("q", data=q)
@@ -72,26 +103,22 @@ with h5py.File(os.path.join(output_dir, 'results.h5'), "w") as file:
     group_hyperparameters.create_dataset("steps", data=steps)
     group_hyperparameters.create_dataset("sigma", data=sigma)
 
-    # Group for original data
     group_0 = file.create_group("original")
     group_0.create_dataset("X_a", data=X_a, compression='gzip')
     group_0.create_dataset("y_a", data=y_a, compression='gzip')
     group_0.create_dataset("X_b", data=X_b, compression='gzip')
     group_0.create_dataset("y_b", data=y_b, compression='gzip')
 
-    # Group for approach 1
     group_1 = file.create_group("difussion_maps")
     group_1.create_dataset("X_a_red", data=X_a_red_1, compression='gzip')
     group_1.create_dataset("X_b_red", data=X_b_red_1, compression='gzip')
 
-    # Group for approach 2
     group_2 = file.create_group("deep_diffusion_maps")
     group_2.create_dataset("X_a_red", data=X_a_red_2, compression='gzip')
     group_2.create_dataset("X_b_red", data=X_b_red_2, compression='gzip')
     group_2.create_dataset("mae", data=mae_2)
     group_2.create_dataset("mae_conf_int", data=mae_2_conf_int)
 
-    # Group for approach 3
     group_3 = file.create_group("nystrom")
     group_3.create_dataset("X_a_red", data=X_a_red_3, compression='gzip')
     group_3.create_dataset("X_b_red", data=X_b_red_3, compression='gzip')
