@@ -174,10 +174,13 @@ with h5py.File(os.path.join(output_dir, 'results.h5'), "r") as file:
     group_3 = file["nystrom"]
     X_a_red_3 = np.array(group_3["X_a_red"][:])
     X_b_red_3 = np.array(group_3["X_b_red"][:])
-
+    P_color_a = np.array(group_3["P_color_a"][:])
+    D_color_a = np.array(group_3["D_color_a"][:])
             
 plot_original(X_a, y_a, output_dir, 'orig_a')
 plot_original(X_b, y_b, output_dir, 'orig_b')
+plot_original(X_a, P_color_a, output_dir, 'probs_a')
+plot_original(X_a, D_color_a, output_dir, 'dists_a')
 plot_projection(X_a_red_1, y_a, output_dir, 'red_a_dm')
 plot_projection(X_a_red_2, y_a, output_dir, 'red_a_ddm')
 plot_projection(X_a_red_3, y_a, output_dir, 'red_a_nys')

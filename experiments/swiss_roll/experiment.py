@@ -9,7 +9,7 @@ from tensorflow.keras.optimizers import Adam
 from DiffusionLoss import DiffusionLoss
 from DiffusionMaps import DiffusionMaps
 from experiments.aux_functions import get_sigma, plot_loglikelihood, plot_eigenvalues
-from experiments.swiss_roll.load_data import get_datasets
+from experiments.swiss_roll.load_data import get_datasets, my_colormap1D, normalize
 from experiments.metrics import mae
 from experiments.models import build_encoder
 
@@ -96,7 +96,18 @@ X_a_red_3 = DM.fit_transform(X_a)
 X_b_red_3 = DM.transform(X_b)
 mae_3, mae_3_conf_int = mae(X_b_red_1, X_b_red_3)
 
+P_a = DM.transition_probabilities(DM.W)
+if steps > 1:
+    P_a = np.linalg.matrix_power(P_a, steps)
 
+D_a = DM.diffusion_distances(P_a, DM.pi)
+point = np.argmin(np.linalg.norm(X_a - np.array([0, -1, -15]), axis=1))
+P_color_a = np.array([my_colormap1D(x, c1=(0, 0, 0), c2=(0, 0.75, 0.75)) for x in normalize(P_a[:, point])])
+D_color_a = np.array([my_colormap1D(x, c1=(0, 0, 0), c2=(0.75, 0, 0.75)) for x in normalize(D_a[:, point])])
+P_color_a[point] = (0.72, 0.53, 0.05) # (0.75, 0, 0.75) 
+D_color_a[point] = (0.72, 0.53, 0.05) # (0, 0.75, 0.75)
+
+# Save results
 with h5py.File(os.path.join(output_dir, 'results.h5'), "w") as file:
     group_hyperparameters = file.create_group("hyperparameters")
     group_hyperparameters.create_dataset("n_components", data=n_components)
@@ -126,3 +137,5 @@ with h5py.File(os.path.join(output_dir, 'results.h5'), "w") as file:
     group_3.create_dataset("X_b_red", data=X_b_red_3, compression='gzip')
     group_3.create_dataset("mae", data=mae_3)
     group_3.create_dataset("mae_conf_int", data=mae_3_conf_int)
+    group_3.create_dataset("P_color_a", data=P_color_a, compression='gzip')
+    group_3.create_dataset("D_color_a", data=D_color_a, compression='gzip')
