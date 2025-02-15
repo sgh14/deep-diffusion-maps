@@ -51,7 +51,7 @@ def plot_original(X, y, output_dir, filename):
     ax.grid(False)
     fig.tight_layout()
     
-    for format in ('.pdf', '.png', '.svg'):
+    for format in ('.pdf',):# '.png', '.svg'):
         fig.savefig(os.path.join(output_dir, filename + format))
 
     plt.close(fig)
@@ -66,34 +66,34 @@ def plot_projection(X, y, output_dir, filename):
             for dim2 in range(dim1 + 1, ndims):
                 fig, ax = plt.subplots(figsize=(3, 3), constrained_layout=True)
                 ax.scatter(X[:, dim1], X[:, dim2], c=y)
-                # Remove the ticks
-                ax.set_xticks([])
-                ax.set_yticks([])
-                # Remove the tick labels
-                ax.set_xticklabels([])
-                ax.set_yticklabels([])
+                # # Remove the ticks
+                # ax.set_xticks([])
+                # ax.set_yticks([])
+                # # Remove the tick labels
+                # ax.set_xticklabels([])
+                # ax.set_yticklabels([])
                 # ax.set_xlabel(r'$\Psi_1$')
                 # ax.set_ylabel(r'$\Psi_2$')
                 ax = set_equal_ranges(ax, max_range) # ax.set_box_aspect(1)
 
-                for format in ('.pdf', '.png', '.svg'):
+                for format in ('.pdf',):# '.png', '.svg'):
                     fig.savefig(os.path.join(output_dir, filename + f'_dims_{dim1+1}_{dim2+1}' + format))
                 
                 plt.close(fig)
     else:
         fig, ax = plt.subplots(figsize=(3, 3), constrained_layout=True)
         ax.scatter(X[:, 0], np.zeros(X.shape[0]), c=y)
-        # Remove the ticks
-        ax.set_xticks([])
-        ax.set_yticks([])
-        # Remove the tick labels
-        ax.set_xticklabels([])
-        ax.set_yticklabels([])
+        # # Remove the ticks
+        # ax.set_xticks([])
+        # ax.set_yticks([])
+        # # Remove the tick labels
+        # ax.set_xticklabels([])
+        # ax.set_yticklabels([])
         # ax.set_xlabel(r'$\Psi_1$')
         # ax.set_ylabel(r'$\Psi_2$')
         ax = set_equal_ranges(ax, max_range) # ax.set_box_aspect(1)
 
-        for format in ('.pdf', '.png', '.svg'):
+        for format in ('.pdf',):# '.png', '.svg'):
             fig.savefig(os.path.join(output_dir, filename + f'_dims_{1}' + format))
         
         plt.close(fig)
@@ -117,13 +117,18 @@ def plot_history(history, output_dir, filename, log_scale=False):
         ax.set_ylabel(key.capitalize())
         ax.set_xlabel('Epoch')
         ax.legend()
-        for format in ('.pdf', '.png', '.svg'):
+        for format in ('.pdf',):# '.png', '.svg'):
             fig.savefig(os.path.join(output_dir, filename + '-' + key + format))
         
         plt.close(fig)
 
 
-output_dir = '/scratch/sgarcia/ddm/experiments/swiss_roll/results'
+n_components, q, alpha, steps = 2, 5e-3, 1, 100
+root = '/scratch/sgarcia/ddm/experiments/swiss_roll/results'
+experiment = f'n_components_{n_components}_q_{q}_alpha_{alpha}_steps_{steps}'
+output_dir = os.path.join(root, experiment)
+os.makedirs(output_dir, exist_ok=True)
+
 with h5py.File(os.path.join(output_dir, 'hist_enc.h5'), 'r') as file:
     history = {key: np.array(file[key]) for key in file.keys()}
 

@@ -6,13 +6,13 @@ import tensorflow as tf
 
 from DiffusionLoss import DiffusionLoss
 from DiffusionMaps import DiffusionMaps
-from experiments.aux_functions import get_sigma, find_optimal_hyperparameters, plot_eigenvalues
+from experiments.aux_functions import get_sigma, plot_loglikelihood, plot_eigenvalues
 from experiments.mnist.load_data import get_datasets
 from experiments.metrics import mae
 from experiments.models import build_conv_encoder
 
-output_dir = '/scratch/sgarcia/ddm/experiments/mnist/results'
-os.makedirs(output_dir, exist_ok=True)
+root = '/scratch/sgarcia/ddm/experiments/mnist/results'
+os.makedirs(root, exist_ok=True)
 
 # Get the data
 (X_a, y_a), (X_b, y_b) = get_datasets(npoints=5000, split=0.1, seed=123, noise=0)
@@ -22,14 +22,18 @@ X_b = np.expand_dims(X_b, axis=-1)
 X = np.vstack([X_a, X_b])
 
 # Find optimal values for n_components, q, steps and alpha
-q_vals = np.array([0.01, 0.1, 0.2])
-alpha_vals = np.array([0])
+q_vals = np.array([0.005, 0.01, 0.1])
+alpha_vals = np.array([0, 1])
 steps_vals = np.array([2**i for i in range(7)])
-# plot_eigenvalues(X_a, q_vals, alpha_vals, steps_vals, output_dir, max_components=25)
-# n_components, q, alpha, steps = find_optimal_hyperparameters(X_a, q_vals, alpha_vals, steps_vals, output_dir, max_components=25)
-n_components, q, alpha, steps = 2, 1e-2, 0, 1
+plot_eigenvalues(X_a, q_vals, alpha_vals, steps_vals, root, max_components=25)
+plot_loglikelihood(X_a, q_vals, alpha_vals, steps_vals, root, max_components=25)
+n_components, q, alpha, steps = 6, 5e-3, 0, 1
 sigma = get_sigma(X_a, q)
 DM = DiffusionMaps(sigma=sigma, n_components=n_components, steps=steps, alpha=alpha)
+
+experiment = f'n_components_{n_components}_q_{q}_alpha_{alpha}_steps_{steps}'
+output_dir = os.path.join(root, experiment)
+os.makedirs(output_dir, exist_ok=True)
 
 # Approach 1: original Diffusion Maps
 X_red_1 = DM.fit_transform(X)

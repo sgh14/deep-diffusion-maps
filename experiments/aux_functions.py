@@ -43,11 +43,10 @@ def log_likelihood(eigenvalues_1, eigenvalues_2):
     return mean_l
 
 
-def find_optimal_hyperparameters(X, q_vals, alpha_vals, steps_vals, output_dir='', max_components=None):
+def plot_loglikelihood(X, q_vals, alpha_vals, steps_vals, output_dir='', max_components=None):
     max_components = max_components if max_components else (X.shape[-1] - 1)
     n_components_vals = np.arange(1, max_components + 1)
-    l_max = -np.inf
-    fig, axes = plt.subplots(len(alpha_vals), 1, figsize=(6, 6), sharex=True, sharey=True, squeeze=False)
+    fig, axes = plt.subplots(len(alpha_vals), 1, figsize=(6, 1+3*len(alpha_vals)), sharex=True, sharey=True, squeeze=False)
     for ax, alpha in zip(axes.flatten(), alpha_vals):
         for j, steps in enumerate(steps_vals):
             for k, q in enumerate(q_vals):
@@ -58,9 +57,6 @@ def find_optimal_hyperparameters(X, q_vals, alpha_vals, steps_vals, output_dir='
                 for n_components in n_components_vals:
                     l = log_likelihood(eigenvalues[:n_components], eigenvalues[n_components:])
                     l_vals.append(l)
-                    if l > l_max:
-                        l_max = l
-                        best_hyperparameters = (n_components, q, alpha, steps)
 
                 ax.plot(n_components_vals, l_vals, color=colors[j], linestyle=linestyles[k])
                 if len(alpha_vals) > 1:
@@ -70,22 +66,21 @@ def find_optimal_hyperparameters(X, q_vals, alpha_vals, steps_vals, output_dir='
     ax.set_xlabel('$d$')
     # ax.set_xticks(n_components_vals)
     # Create custom legends
-    q_legend = {f'${q:.2f}$': Line2D([0], [0], linewidth=2, color='gray', linestyle=linestyles[i]) for i, q in enumerate(q_vals)}
+    q_legend = {f'${q}$': Line2D([0], [0], linewidth=2, color='gray', linestyle=linestyles[i]) for i, q in enumerate(q_vals)}
     steps_legend = {f'${steps}$': Line2D([0], [0], linewidth=2, color=colors[i]) for i, steps in enumerate(steps_vals)}
+    scale_factor = 2.5/len(alpha_vals)
     if len(q_vals) > 1:
-        fig.legend(q_legend.values(), q_legend.keys(), title="Valor de $q$", loc='lower center', bbox_to_anchor=(0.5, -0.05), ncol=6, handletextpad=0.3, columnspacing=0.3)
+        fig.legend(q_legend.values(), q_legend.keys(), title="Valor de $q$", loc='lower center', bbox_to_anchor=(0.5, -0.05*scale_factor), ncol=6, handletextpad=0.3, columnspacing=0.3)
     if len(steps_vals) > 1:
-        fig.legend(steps_legend.values(), steps_legend.keys(), title="Valor de $t$", loc='lower center', bbox_to_anchor=(0.5, -0.13), ncol=7, handletextpad=0.3, columnspacing=0.3, handlelength=2.5)
-    for format in ('.pdf', '.png', '.svg'):
+        fig.legend(steps_legend.values(), steps_legend.keys(), title="Valor de $t$", loc='lower center', bbox_to_anchor=(0.5, -(0.05*scale_factor + 0.08)), ncol=7, handletextpad=0.3, columnspacing=0.3, handlelength=2.5)
+    for format in ('.pdf',):# '.png', '.svg'):
         fig.savefig(os.path.join(output_dir, 'l_values' + format))
-    
-    return best_hyperparameters
 
 
 def plot_eigenvalues(X, q_vals, alpha_vals, steps_vals, output_dir='', max_components=None, log_scale=False):
     max_components = max_components if max_components else (X.shape[-1] - 1)
     x = np.arange(1, max_components + 1)
-    fig, axes = plt.subplots(len(alpha_vals), 1, figsize=(6, 6), sharex=True, sharey=True, squeeze=False)
+    fig, axes = plt.subplots(len(alpha_vals), 1, figsize=(6, 1+3*len(alpha_vals)), sharex=True, sharey=True, squeeze=False)
     for ax, alpha in zip(axes.flatten(), alpha_vals):
         for j, steps in enumerate(steps_vals):
             for k, q in enumerate(q_vals):
@@ -96,16 +91,17 @@ def plot_eigenvalues(X, q_vals, alpha_vals, steps_vals, output_dir='', max_compo
                 ax.plot(x, y, color=colors[j], linestyle=linestyles[k])
                 if len(alpha_vals) > 1:
                     ax.set_title(f'$\\alpha = {alpha}$')
-                ax.set_ylabel('$\\log(\\lambda^t)$' if log_scale else '\\lambda^t')
+                ax.set_ylabel('$\\log(\\lambda^t)$' if log_scale else '$\\lambda^t$')
 
     ax.set_xlabel('$d$')
     # ax.set_xticks(x)
     # Create custom legends
-    q_legend = {f'${q:.2f}$': Line2D([0], [0], linewidth=2, color='gray', linestyle=linestyles[i]) for i, q in enumerate(q_vals)}
+    q_legend = {f'${q}$': Line2D([0], [0], linewidth=2, color='gray', linestyle=linestyles[i]) for i, q in enumerate(q_vals)}
     steps_legend = {f'${steps}$': Line2D([0], [0], linewidth=2, color=colors[i]) for i, steps in enumerate(steps_vals)}
+    scale_factor = 3/len(alpha_vals)
     if len(q_vals) > 1:
-        fig.legend(q_legend.values(), q_legend.keys(), title="Valor de $q$", loc='lower center', bbox_to_anchor=(0.5, -0.05), ncol=6, handletextpad=0.3, columnspacing=0.3)
+        fig.legend(q_legend.values(), q_legend.keys(), title="Valor de $q$", loc='lower center', bbox_to_anchor=(0.5, -0.05*scale_factor), ncol=6, handletextpad=0.3, columnspacing=0.3)
     if len(steps_vals) > 1:
-        fig.legend(steps_legend.values(), steps_legend.keys(), title="Valor de $t$", loc='lower center', bbox_to_anchor=(0.5, -0.13), ncol=7, handletextpad=0.3, columnspacing=0.3, handlelength=2.5)
-    for format in ('.pdf', '.png', '.svg'):
+        fig.legend(steps_legend.values(), steps_legend.keys(), title="Valor de $t$", loc='lower center', bbox_to_anchor=(0.5, -(0.05*scale_factor + 0.08)), ncol=7, handletextpad=0.3, columnspacing=0.3, handlelength=2.5)
+    for format in ('.pdf',):# '.png', '.svg'):
         fig.savefig(os.path.join(output_dir, 'eigenvalues' + format))

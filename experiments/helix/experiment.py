@@ -5,27 +5,32 @@ import h5py
 
 from DiffusionLoss import DiffusionLoss
 from DiffusionMaps import DiffusionMaps
-from experiments.aux_functions import get_sigma, find_optimal_hyperparameters, plot_eigenvalues
+from experiments.aux_functions import get_sigma, plot_loglikelihood, plot_eigenvalues
 from experiments.helix.load_data import get_datasets
 from experiments.metrics import mae
 from experiments.models import build_encoder
 
-output_dir = '/scratch/sgarcia/ddm/experiments/helix/results'
-os.makedirs(output_dir, exist_ok=True)
+
+root = '/scratch/sgarcia/ddm/experiments/helix/results'
+os.makedirs(root, exist_ok=True)
 
 # Get the data
 (X_a, y_a), (X_b, y_b) = get_datasets(npoints=2000, split=0.5, seed=123, noise=0)
 X = np.vstack([X_a, X_b])
 
 # Find optimal values for n_components, q, steps and alpha
-q_vals = np.array([0.01, 0.1, 0.2])
-alpha_vals = np.array([1])
+q_vals = np.array([0.005, 0.01, 0.1])
+alpha_vals = np.array([0, 1])
 steps_vals = np.array([2**i for i in range(7)])
-# plot_eigenvalues(X_a, q_vals, alpha_vals, steps_vals, output_dir, max_components=25)
-# n_components, q, alpha, steps = find_optimal_hyperparameters(X_a, q_vals, alpha_vals, steps_vals, output_dir, max_components=25)
-n_components, q, alpha, steps = 2, 1e-2, 1, 1
+plot_eigenvalues(X_a, q_vals, alpha_vals, steps_vals, root, max_components=25)
+plot_loglikelihood(X_a, q_vals, alpha_vals, steps_vals, root, max_components=25)
+n_components, q, alpha, steps = 2, 2e-2, 1, 100
 sigma = get_sigma(X_a, q)
 DM = DiffusionMaps(sigma=sigma, n_components=n_components, steps=steps, alpha=alpha)
+
+experiment = f'n_components_{n_components}_q_{q}_alpha_{alpha}_steps_{steps}'
+output_dir = os.path.join(root, experiment)
+os.makedirs(output_dir, exist_ok=True)
 
 # Approach 1: original Diffusion Maps
 X_red_1 = DM.fit_transform(X)
@@ -38,7 +43,7 @@ tic = time.perf_counter()
 loss = DiffusionLoss(X_a, sigma=sigma, steps=steps, alpha=alpha)
 encoder.compile(loss=loss, optimizer='adam')
 indices = np.array(list(range(X_a.shape[0])))
-hist_enc = encoder.fit(x=X_a, y=indices, epochs=500, validation_split=0.1, shuffle=False, batch_size=128, verbose=0)
+hist_enc = encoder.fit(x=X_a, y=indices, epochs=500, validation_split=0.1, shuffle=False, batch_size=64, verbose=0)
 X_a_red_2 = encoder(X_a)
 tac = time.perf_counter()
 X_b_red_2 = encoder(X_b)
