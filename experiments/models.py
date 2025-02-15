@@ -5,16 +5,20 @@ from tensorflow.keras.layers import *
 class EncoderHead(Layer):
     def __init__(self, n_components, use_bn=False, **kwargs):
         super(EncoderHead, self).__init__(**kwargs)
+        self.n_components = n_components
         self.use_bn = use_bn
-        self.batch_normalization = BatchNormalization()
-        self.dense = Dense(n_components, activation='linear', use_bias= not use_bn)
+        self.batch_normalization = BatchNormalization() if use_bn else None
+        self.dense = None  # Initialize in build
 
+    def build(self, input_shape):
+        """This method initializes the weights once the input shape is known."""
+        self.dense = Dense(self.n_components, activation='linear', use_bias=not self.use_bn)
+        super().build(input_shape)  # Important: Call the parent build method
 
     def call(self, inputs, training=False):
-        x = self.batch_normalization(inputs, training=training) if self.use_bn else inputs
-        x = self.dense(x)
-
-        return x
+        if self.use_bn:
+            inputs = self.batch_normalization(inputs, training=training)
+        return self.dense(inputs)
     
 
 def build_encoder(input_shape, units, n_components, activation='relu', use_bn=False):
