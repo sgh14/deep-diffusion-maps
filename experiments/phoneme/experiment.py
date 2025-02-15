@@ -35,12 +35,12 @@ X_a_red_1 = X_red_1[:len(X_a)]
 X_b_red_1 = X_red_1[len(X_a):]
 
 # Approach 2: Diffusion Maps with Diffusion Loss
-encoder = build_seq_encoder(input_shape=X_a.shape[1:], filters=8, n_components=2, zero_padding=0, use_bn=False)
+encoder = build_seq_encoder(input_shape=X_a.shape[1:], units=32, n_components=2, use_bn=False)
 tic = time.perf_counter()
 loss = DiffusionLoss(X_a, sigma=sigma, steps=steps, alpha=alpha)
-encoder.compile(loss=loss, optimizer=tf.keras.optimizers.Adam(learning_rate=0.005))
+encoder.compile(loss=loss, optimizer=tf.keras.optimizers.Adam(learning_rate=0.001))
 indices = np.array(list(range(X_a.shape[0])))
-hist_enc = encoder.fit(x=X_a, y=indices, epochs=750, validation_split=0.1, shuffle=False, batch_size=128, verbose=0)
+hist_enc = encoder.fit(x=X_a, y=indices, epochs=100, validation_split=0.1, shuffle=False, batch_size=128, verbose=0)
 X_a_red_2 = encoder(X_a)
 tac = time.perf_counter()
 X_b_red_2 = encoder(X_b)

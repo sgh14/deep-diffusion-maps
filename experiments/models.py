@@ -104,14 +104,26 @@ class ConvBlock1D(Layer):
         return x
 
 
-def build_seq_encoder(input_shape, filters, n_components, zero_padding=0, dropout=0.0, use_bn=False):
+# def build_seq_encoder(input_shape, filters, n_components, zero_padding=0, dropout=0.0, use_bn=False):
+#     encoder = Sequential([
+#         Input(shape=input_shape),
+#         ZeroPadding1D(zero_padding),
+#         ConvBlock1D(filters, dropout=dropout),
+#         ConvBlock1D(filters*2, dropout=dropout),
+#         ConvBlock1D(filters*4, dropout=dropout),
+#         Flatten(),
+#         EncoderHead(n_components, use_bn)
+#     ], name='encoder')
+
+#     return encoder
+
+
+def build_seq_encoder(input_shape, units, n_components, dropout=0.0, use_bn=False):
     encoder = Sequential([
         Input(shape=input_shape),
-        ZeroPadding1D(zero_padding),
-        ConvBlock1D(filters, dropout=dropout),
-        ConvBlock1D(filters*2, dropout=dropout),
-        ConvBlock1D(filters*4, dropout=dropout),
-        Flatten(),
+        Bidirectional(LSTM(units, return_sequences=True, dropout=dropout)),
+        Bidirectional(LSTM(units * 2, return_sequences=True, dropout=dropout)),
+        Bidirectional(LSTM(units * 4, return_sequences=False, dropout=dropout)),  # No return_sequences for final layer
         EncoderHead(n_components, use_bn)
     ], name='encoder')
 
