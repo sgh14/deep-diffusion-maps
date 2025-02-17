@@ -126,8 +126,8 @@ def build_seq_encoder(input_shape, units, n_components, dropout=0.0, use_bn=Fals
     encoder = Sequential([
         Input(shape=input_shape),
         Bidirectional(LSTM(units, return_sequences=True, dropout=dropout)),
-        Bidirectional(LSTM(units * 2, return_sequences=True, dropout=dropout)),
-        Bidirectional(LSTM(units * 4, return_sequences=False, dropout=dropout)),  # No return_sequences for final layer
+        Bidirectional(LSTM(units // 2, return_sequences=True, dropout=dropout)),
+        Bidirectional(LSTM(units // 4, return_sequences=False, dropout=dropout)),  # No return_sequences for final layer
         EncoderHead(n_components, use_bn)
     ], name='encoder')
 
