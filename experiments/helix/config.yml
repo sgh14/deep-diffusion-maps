@@ -5,14 +5,14 @@ data:
   seed: 123
 diffusion_maps:
   n_components: 2
-  quantile: 2.0e-2
+  quantile: 3.0e-2
   alpha: 1
   steps: 100
 encoder:
   units: 128
   epochs: 1000
-  batch_size: 64
-  learning_rate: 0.001
+  batch_size: 128
+  learning_rate: 0.01
   validation_split: 0.1
-  batch_normalization: True
+  batch_normalization: False
 output_dir: /scratch/sgarcia/ddm/experiments/helix/results

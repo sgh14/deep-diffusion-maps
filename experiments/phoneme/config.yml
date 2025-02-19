@@ -4,14 +4,14 @@ data:
   seed: 123
 diffusion_maps:
   n_components: 2
-  quantile: 1.0e-2
+  quantile: 5.0e-3
   alpha: 0
   steps: 1
 encoder:
-  units: 32
-  epochs: 10
-  batch_size: 64
-  learning_rate: 0.001
+  units: 128
+  epochs: 500
+  batch_size: 128
+  learning_rate: 0.01
   validation_split: 0.1
   batch_normalization: False
 output_dir: /scratch/sgarcia/ddm/experiments/phoneme/results
