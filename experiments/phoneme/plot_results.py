@@ -6,6 +6,8 @@ import matplotlib.ticker as ticker
 import argparse
 import yaml
 
+from experiments.aux_functions import plot_eigenvalues_and_log_likelihood
+
 plt.style.use('experiments/science.mplstyle')
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 classes = {0: 'aa', 1: 'ao', 2: 'dcl', 3: 'iy', 4: 'sh'}
@@ -178,7 +180,8 @@ with h5py.File(os.path.join(output_dir, 'results.h5'), "r") as file:
     group_3 = file["nystrom"]
     X_a_red_3 = np.array(group_3["X_a_red"][:])
     X_b_red_3 = np.array(group_3["X_b_red"][:])
-
+    eigenvalues = np.array(group_3["eigenvalues"][:])
+    log_likelihood = np.array(group_3["log_likelihood"][:])
             
 plot_original(X_a, y_a, output_dir, 'orig_a')
 plot_original(X_b, y_b, output_dir, 'orig_b')
@@ -188,3 +191,4 @@ plot_projection(X_a_red_3, y_a, output_dir, 'red_a_nys')
 plot_projection(X_b_red_1, y_b, output_dir, 'red_b_dm')
 plot_projection(X_b_red_2, y_b, output_dir, 'red_b_ddm')
 plot_projection(X_b_red_3, y_b, output_dir, 'red_b_nys')
+plot_eigenvalues_and_log_likelihood([eigenvalues], [log_likelihood], ['Phoneme'], output_dir)

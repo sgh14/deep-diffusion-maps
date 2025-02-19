@@ -66,7 +66,7 @@ def mrae(x_true, x_pred, conf_level=0.95):
     return mean, conf_int
 
 
-def distances_mae_and_mrae(x_true, x_pred, conf_level=0.95):
+def distances_errors(x_true, x_pred, conf_level=0.95):
     """
     Calculate the Mean Absolute Error (MAE) and Mean Relative Absolute Error (MRAE) between two sets of points.
     

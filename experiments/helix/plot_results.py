@@ -6,6 +6,8 @@ import matplotlib.ticker as ticker
 import argparse
 import yaml
 
+from experiments.aux_functions import plot_eigenvalues_and_log_likelihood
+
 plt.style.use('experiments/science.mplstyle')
 
 
@@ -129,7 +131,6 @@ def plot_history(history, output_dir, filename, log_scale=False):
         plt.close(fig)
 
 
-
 # Argument Parser
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--config", type=str, required=True, help="Path to the YAML configuration file.")
@@ -180,7 +181,9 @@ with h5py.File(os.path.join(output_dir, 'results.h5'), "r") as file:
     X_b_red_3 = np.array(group_3["X_b_red"][:])
     P_color_a = np.array(group_3["P_color_a"][:])
     D_color_a = np.array(group_3["D_color_a"][:])
-
+    eigenvalues = np.array(group_3["eigenvalues"][:])
+    log_likelihood = np.array(group_3["log_likelihood"][:])
+    
 plot_original(X_a, y_a, output_dir, 'orig_a')
 plot_original(X_b, y_b, output_dir, 'orig_b')
 plot_original(X_a, P_color_a, output_dir, 'probs_a')
@@ -191,3 +194,4 @@ plot_projection(X_a_red_3, y_a, output_dir, 'red_a_nys')
 plot_projection(X_b_red_1, y_b, output_dir, 'red_b_dm')
 plot_projection(X_b_red_2, y_b, output_dir, 'red_b_ddm')
 plot_projection(X_b_red_3, y_b, output_dir, 'red_b_nys')
+plot_eigenvalues_and_log_likelihood([eigenvalues], [log_likelihood], ['Swiss Roll'], output_dir)

@@ -4,7 +4,6 @@ from scipy.spatial.distance import pdist
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 
-from DiffusionMaps import DiffusionMaps
 
 plt.style.use('experiments/science.mplstyle')
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -20,88 +19,81 @@ def get_sigma(X, q=0.5):
 
 
 def log_gaussian_density(x, mean, var):
-    # p = 1/np.sqrt(2*np.pi*var)*np.exp(-(x-mean)**2/(2*var))
-    # ids = p == 0 | np.isnan(p) | np.isinf(p)
-    # p = np.where(ids, np.mean(p[~ids]), p)
     log_p = -0.5*np.log(2*np.pi*var) - (x - mean)**2/(2*var)
 
     return log_p
 
 
-def log_likelihood(eigenvalues_1, eigenvalues_2):
-    p, q = len(eigenvalues_1), len(eigenvalues_2)
-    sample_mean_1 = np.mean(eigenvalues_1)
-    sample_var_1 = np.var(eigenvalues_1, ddof=1 if len(eigenvalues_1) > 1 else 0)
-    sample_mean_2 = np.mean(eigenvalues_2)
-    sample_var_2 = np.var(eigenvalues_2, ddof=1 if len(eigenvalues_1) > 1 else 0)
+def log_likelihood(x, y):
+    p, q = len(x), len(y)
+    sample_mean_1 = np.mean(x)
+    sample_var_1 = np.var(x, ddof=1 if len(x) > 1 else 0)
+    sample_mean_2 = np.mean(y)
+    sample_var_2 = np.var(y, ddof=1 if len(y) > 1 else 0)
     var = ((p - 1)*sample_var_1 + (q - 1)*sample_var_2)/(p + q - 2)
-    l = np.sum(log_gaussian_density(eigenvalues_1, sample_mean_1, var))\
-        + np.sum(log_gaussian_density(eigenvalues_2, sample_mean_2, var))
+    l = np.sum(log_gaussian_density(x, sample_mean_1, var))\
+        + np.sum(log_gaussian_density(y, sample_mean_2, var))
     
     mean_l = l / (p + q)
     
     return mean_l
 
 
-def plot_loglikelihood(X, q_vals, alpha_vals, steps_vals, output_dir='', max_components=None):
-    max_components = max_components if max_components else (X.shape[-1] - 1)
+def log_likelihood_curve(eigenvalues, max_components=25):
     n_components_vals = np.arange(1, max_components + 1)
-    fig, axes = plt.subplots(len(alpha_vals), 1, figsize=(6, 1+3*len(alpha_vals)), sharex=True, sharey=True, squeeze=False)
-    for ax, alpha in zip(axes.flatten(), alpha_vals):
-        for j, steps in enumerate(steps_vals):
-            for k, q in enumerate(q_vals):
-                DM = DiffusionMaps(get_sigma(X, q), 2, steps, alpha)
-                _ = DM.fit_transform(X)
-                eigenvalues = DM.lambdas[1:]**steps
-                l_vals = []
-                for n_components in n_components_vals:
-                    l = log_likelihood(eigenvalues[:n_components], eigenvalues[n_components:])
-                    l_vals.append(l)
+    l_vals = np.empty((len(n_components_vals),))
+    for i, n_components in enumerate(n_components_vals):
+        x = eigenvalues[:n_components]
+        y = eigenvalues[n_components:]
+        l_vals[i] = log_likelihood(x, y)
 
-                ax.plot(n_components_vals, l_vals, color=colors[j], linestyle=linestyles[k])
-                if len(alpha_vals) > 1:
-                    ax.set_title(f'$\\alpha = {alpha}$')
-                ax.set_ylabel('log-likelihood')
+    return l_vals
 
-    ax.set_xlabel('$d$')
-    # ax.set_xticks(n_components_vals)
+
+def plot_eigenvalues_and_log_likelihood(
+        eigenvalues_curves,
+        log_likelihood_curves,
+        labels,
+        output_dir
+):
+    os.makedirs(output_dir, exist_ok=True)
+    fig, ax1 = plt.subplots()
+    ax2 = ax1.twinx()
+    max_components = min([len(l_curve) for l_curve in log_likelihood_curves])
+    n_components_vals = np.arange(1, max_components + 1)
+    for i in range(len(eigenvalues_curves)):
+        ax1.plot(
+            n_components_vals,
+            eigenvalues_curves[i][:max_components],
+            color=colors[0],
+            linestyle=linestyles[i]
+        )
+        ax2.plot(
+            n_components_vals,
+            log_likelihood_curves[i][:max_components],
+            color=colors[1],
+            linestyle=linestyles[i]
+        )
+
+    ax1.set_xlabel('$d$')
+    ax1.set_ylabel('$\\lambda^t_d$', color=colors[0])
+    ax1.tick_params(axis='y', labelcolor=colors[0])
+    ax2.set_ylabel('log-likelihood', color=colors[1])
+    ax2.tick_params(axis='y', labelcolor=colors[1])
     # Create custom legends
-    q_legend = {f'${q}$': Line2D([0], [0], linewidth=2, color='gray', linestyle=linestyles[i]) for i, q in enumerate(q_vals)}
-    steps_legend = {f'${steps}$': Line2D([0], [0], linewidth=2, color=colors[i]) for i, steps in enumerate(steps_vals)}
-    scale_factor = 2.5/len(alpha_vals)
-    if len(q_vals) > 1:
-        fig.legend(q_legend.values(), q_legend.keys(), title="Valor de $q$", loc='lower center', bbox_to_anchor=(0.5, -0.05*scale_factor), ncol=6, handletextpad=0.3, columnspacing=0.3)
-    if len(steps_vals) > 1:
-        fig.legend(steps_legend.values(), steps_legend.keys(), title="Valor de $t$", loc='lower center', bbox_to_anchor=(0.5, -(0.05*scale_factor + 0.08)), ncol=7, handletextpad=0.3, columnspacing=0.3, handlelength=2.5)
+    if len(eigenvalues_curves) > 1:
+        legend = {label: Line2D([0], [0], linewidth=2, color='gray', linestyle=linestyles[i]) for i, label in enumerate(labels)}
+        fig.legend(
+            legend.values(),
+            legend.keys(),
+            loc='lower center',
+            bbox_to_anchor=(0.5, -0.05),
+            ncol=4,
+            handletextpad=0.3,
+            columnspacing=0.3
+        )
+
     for format in ('.pdf',):# '.png', '.svg'):
-        fig.savefig(os.path.join(output_dir, 'l_values' + format))
+        fig.savefig(os.path.join(output_dir, 'eigenvalues-log_likelihood' + format))
 
-
-def plot_eigenvalues(X, q_vals, alpha_vals, steps_vals, output_dir='', max_components=None, log_scale=False):
-    max_components = max_components if max_components else (X.shape[-1] - 1)
-    x = np.arange(1, max_components + 1)
-    fig, axes = plt.subplots(len(alpha_vals), 1, figsize=(6, 1+3*len(alpha_vals)), sharex=True, sharey=True, squeeze=False)
-    for ax, alpha in zip(axes.flatten(), alpha_vals):
-        for j, steps in enumerate(steps_vals):
-            for k, q in enumerate(q_vals):
-                DM = DiffusionMaps(get_sigma(X, q), 2, steps, alpha)
-                _ = DM.fit_transform(X)
-                eigenvalues = DM.lambdas[1:]**steps
-                y = np.log(eigenvalues[:max_components]) if log_scale else eigenvalues[:max_components]
-                ax.plot(x, y, color=colors[j], linestyle=linestyles[k])
-                if len(alpha_vals) > 1:
-                    ax.set_title(f'$\\alpha = {alpha}$')
-                ax.set_ylabel('$\\log(\\lambda^t)$' if log_scale else '$\\lambda^t$')
-
-    ax.set_xlabel('$d$')
-    # ax.set_xticks(x)
-    # Create custom legends
-    q_legend = {f'${q}$': Line2D([0], [0], linewidth=2, color='gray', linestyle=linestyles[i]) for i, q in enumerate(q_vals)}
-    steps_legend = {f'${steps}$': Line2D([0], [0], linewidth=2, color=colors[i]) for i, steps in enumerate(steps_vals)}
-    scale_factor = 3/len(alpha_vals)
-    if len(q_vals) > 1:
-        fig.legend(q_legend.values(), q_legend.keys(), title="Valor de $q$", loc='lower center', bbox_to_anchor=(0.5, -0.05*scale_factor), ncol=6, handletextpad=0.3, columnspacing=0.3)
-    if len(steps_vals) > 1:
-        fig.legend(steps_legend.values(), steps_legend.keys(), title="Valor de $t$", loc='lower center', bbox_to_anchor=(0.5, -(0.05*scale_factor + 0.08)), ncol=7, handletextpad=0.3, columnspacing=0.3, handlelength=2.5)
-    for format in ('.pdf',):# '.png', '.svg'):
-        fig.savefig(os.path.join(output_dir, 'eigenvalues' + format))
+    plt.close(fig)
