@@ -13,6 +13,8 @@ Additionaly, you may need to install LaTex to create the plots.
 
 ## Usage
 
+### Local
+
 First, activate the environment:
 
 ```bash
@@ -33,3 +35,17 @@ bash experiments/run_experiments.sh
 ```
 
 You can modify the parameters of the experiments in their corresponding `config.yml` files.
+
+### Server
+
+To run one of the experiments, for example the one for Swiss Roll, execute
+
+```bash
+sbatch experiments/swiss_roll/run_experiment.sh
+```
+
+To run all the experiments, execute
+
+```bash
+bash experiments/run_experiments-sbatch.sh
+```
