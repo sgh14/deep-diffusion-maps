@@ -3,6 +3,7 @@ import numpy as np
 from scipy.spatial.distance import pdist
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
+from sklearn.neighbors import NearestNeighbors
 
 from DiffusionMaps import DiffusionMaps
 
@@ -35,10 +36,8 @@ def log_likelihood(x, y):
     var = ((p - 1)*sample_var_1 + (q - 1)*sample_var_2)/(p + q - 2)
     l = np.sum(log_gaussian_density(x, sample_mean_1, var))\
         + np.sum(log_gaussian_density(y, sample_mean_2, var))
-    
-    mean_l = l / (p + q)
-    
-    return mean_l
+        
+    return l
 
 
 def log_likelihood_curve(eigenvalues, max_components=25):
@@ -266,3 +265,39 @@ def plot_distance_percentiles(X, q_vals, alpha_vals, steps_vals, output_dir=''):
 #         fig.savefig(os.path.join(output_dir, 'distances' + format))
     
 #     plt.close(fig)
+
+
+def levina_bickel_estimator(X, k):
+    """
+    Estimate the intrinsic dimension of a dataset X using the Levina–Bickel estimator.
+    """
+    nbrs = NearestNeighbors(n_neighbors=k).fit(X)
+    distances, _ = nbrs.kneighbors(X)
+    d_estimates = []
+    # For each point, ignore the zero distance (itself) and use the k-th nearest neighbor.
+    for i in range(X.shape[0]):
+        # Exclude the first distance which is zero.
+        distances_i = distances[i, 1:]
+        if distances_i[-1] == 0:
+            d_estimates.append(np.nan)
+            continue
+        # Levina–Bickel formula: inverse of the mean log-ratio of the distances.
+        d_local = 1.0 / np.mean(np.log(distances_i[-1] / distances_i[:-1]))
+        d_estimates.append(d_local)
+    
+    mean_d = np.mean(d_estimates)
+        
+    return mean_d
+
+
+def plot_intrinsic_dimension_estimation(X, k_max, output_dir=''):
+    k_vals = np.arange(5, k_max + 1)
+    d_vals = np.array([levina_bickel_estimator(X, k) for k in k_vals])
+    fig, ax = plt.subplots()
+    ax.plot(k_vals, d_vals, color=colors[0], linestyle='-')
+    ax.set_xlabel('$k$')
+    ax.set_ylabel('$d$')
+    for format in ('.pdf',):# '.png', '.svg'):
+        fig.savefig(os.path.join(output_dir, 'intrinsic_dimension' + format))
+    
+    plt.close(fig)

@@ -3,7 +3,7 @@ import os
 import argparse
 import yaml
 
-from experiments.aux_functions import plot_eigenvalues, plot_loglikelihood, plot_distance_percentiles
+from experiments.aux_functions import plot_eigenvalues, plot_loglikelihood, plot_distance_percentiles, plot_intrinsic_dimension_estimation
 from experiments.helix.load_data import get_datasets
 
 
@@ -38,4 +38,5 @@ X = np.vstack([X_a, X_b])
 
 plot_eigenvalues(X_a, q_vals, alpha_vals, steps_vals, output_dir, max_components)
 plot_loglikelihood(X_a, q_vals, alpha_vals, steps_vals, output_dir, max_components)
-plot_distance_percentiles(X_a, q_vals, alpha_vals, steps_vals, output_dir)
+# plot_distance_percentiles(X_a, q_vals, alpha_vals, steps_vals, output_dir)
+plot_intrinsic_dimension_estimation(X_a, k_max=X_a.shape[0]//2, output_dir=output_dir)
