@@ -10,5 +10,6 @@
 # conda activate dm_nys
 
 printf "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\nEXPERIMENT: MNIST\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
+python -m experiments.mnist.hyperparameters_search -c experiments/mnist/config.yml
 python -m experiments.mnist.experiment -c experiments/mnist/config.yml
 python -m experiments.mnist.plot_results -c experiments/mnist/config.yml

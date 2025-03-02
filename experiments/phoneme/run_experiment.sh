@@ -10,5 +10,6 @@
 # conda activate dm_nys
 
 printf "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\nEXPERIMENT: PHONEME\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
+python -m experiments.phoneme.hyperparameters_search -c experiments/phoneme/config.yml
 python -m experiments.phoneme.experiment -c experiments/phoneme/config.yml
 python -m experiments.phoneme.plot_results -c experiments/phoneme/config.yml
