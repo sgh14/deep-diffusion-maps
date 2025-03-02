@@ -35,6 +35,8 @@ steps = config['diffusion_maps']['steps']
 experiment = f'n_components_{n_components}_q_{q}_alpha_{alpha}_steps_{steps}'
 output_dir = os.path.join(root, experiment)
 os.makedirs(output_dir, exist_ok=True)
+# Copy configuration file
+os.system(f'cp {args.config} {output_dir}')
 
 # Get the data
 (X_a, y_a), (X_b, y_b) = get_datasets(
