@@ -1,0 +1,23 @@
+data:
+  npoints: 2000
+  split: 0.5
+  noise: 0.0
+  seed: 123
+hyperparameters_search:
+  max_components: 25
+  quantile_values: [5.0e-3, 1.0e-2, 5.0e-2, 1.0e-1]
+  alpha_values: [0, 1]
+  steps_values: [1, 10, 100]
+diffusion_maps:
+  n_components: 2
+  quantile: 5.0e-3
+  alpha: 1
+  steps: 100
+encoder:
+  units: 128
+  epochs: 1000
+  batch_size: 128
+  learning_rate: 0.01
+  validation_split: 0.1
+  batch_normalization: False
+output_dir: /scratch/sgarcia/ddm/experiments/s_curve/results
