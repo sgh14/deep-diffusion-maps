@@ -301,3 +301,30 @@ def plot_intrinsic_dimension_estimation(X, k_max, output_dir=''):
         fig.savefig(os.path.join(output_dir, 'intrinsic_dimension' + format))
     
     plt.close(fig)
+
+
+def plot_history(history, output_dir, filename, logy=False, logx=False):
+    os.makedirs(output_dir, exist_ok=True)
+
+    keys = [key for key in history.keys() if not key.startswith('val_')]
+    for key in keys:
+        y = np.array([history[key], history['val_' + key]])
+        fig, ax = plt.subplots()
+        if logy and logx:
+            ax.loglog(y[0], label='Training')
+            ax.loglog(y[1], label='Validation')
+        elif logy and not logx:
+            ax.semilogy(y[0], label='Training')
+            ax.semilogy(y[1], label='Validation')
+        else:
+            ax.plot(y[0], label='Training')
+            ax.plot(y[1], label='Validation')
+            ax.ticklabel_format(axis='both', style='sci', scilimits=(-1, 1), useMathText=True)
+        
+        ax.set_ylabel(key.capitalize())
+        ax.set_xlabel('Epoch')
+        ax.legend()
+        for format in ('.pdf',):# '.png', '.svg'):
+            fig.savefig(os.path.join(output_dir, filename + '-' + key + format))
+        
+        plt.close(fig)

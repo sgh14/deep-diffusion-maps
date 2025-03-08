@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 import argparse
 import yaml
 
-from experiments.aux_functions import plot_eigenvalues_and_log_likelihood
+from experiments.aux_functions import plot_eigenvalues_and_log_likelihood, plot_history
 
 plt.style.use('experiments/science.mplstyle')
 
@@ -103,30 +103,6 @@ def plot_projection(X, y, output_dir, filename):
         plt.close(fig)
 
 
-def plot_history(history, output_dir, filename, log_scale=False):
-    os.makedirs(output_dir, exist_ok=True)
-
-    keys = [key for key in history.keys() if not key.startswith('val_')]
-    for key in keys:
-        y = np.array([history[key], history['val_' + key]])
-        fig, ax = plt.subplots()
-        if log_scale:
-            ax.semilogy(y[0], label='Training')
-            ax.semilogy(y[1], label='Validation')
-        else:
-            ax.plot(y[0], label='Training')
-            ax.plot(y[1], label='Validation')
-            ax.ticklabel_format(axis='both', style='sci', scilimits=(-1, 1), useMathText=True)
-        
-        ax.set_ylabel(key.capitalize())
-        ax.set_xlabel('Epoch')
-        ax.legend()
-        for format in ('.pdf',):# '.png', '.svg'):
-            fig.savefig(os.path.join(output_dir, filename + '-' + key + format))
-        
-        plt.close(fig)
-
-
 # Argument Parser
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--config", type=str, required=True, help="Path to the YAML configuration file.")
@@ -150,7 +126,7 @@ output_dir = os.path.join(root, experiment)
 with h5py.File(os.path.join(output_dir, 'hist_enc.h5'), 'r') as file:
     history = {key: np.array(file[key]) for key in file.keys()}
 
-plot_history(history, output_dir, 'hist_enc', log_scale=True)
+plot_history(history, output_dir, 'hist_enc', logy=True, logx=True)
 
 # Load data from the HDF5 file
 with h5py.File(os.path.join(output_dir, 'results.h5'), "r") as file:
