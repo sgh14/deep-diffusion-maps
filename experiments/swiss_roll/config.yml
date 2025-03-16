@@ -3,21 +3,20 @@ data:
   split: 0.5
   noise: 0.0
   seed: 123
-hyperparameters_search:
-  max_components: 25
-  quantile_values: [5.0e-3, 1.0e-2, 5.0e-2, 1.0e-1]
-  alpha_values: [0, 1]
-  steps_values: [1, 4, 16, 64]
 diffusion_maps:
   n_components: 2
-  quantile: 0.05 #5.0e-3
+  quantile: 5.0e-3
   alpha: 1
-  steps: 16 #100
+  steps: 100
 encoder:
   units: 128
-  epochs: 1000
-  batch_size: 128
+  epochs: 5000
+  batch_size: 512
   learning_rate: 0.01
   validation_split: 0.1
   batch_normalization: False
+  batch_size_scheduler:
+    period: 1000
+    increase_factor: 2
+    max_batch_size: 900
 output_dir: /scratch/sgarcia/ddm/experiments/swiss_roll/results

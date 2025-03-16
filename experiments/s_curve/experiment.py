@@ -72,7 +72,7 @@ hist_enc = encoder.fit(
     y=indices,
     epochs=config['encoder']['epochs'],
     validation_split=config['encoder']['validation_split'],
-    shuffle=False,
+    shuffle=True,
     batch_size=config['encoder']['batch_size'],
     verbose=2
 )
@@ -84,16 +84,16 @@ with h5py.File(os.path.join(output_dir, 'hist_enc.h5'), 'w') as file:
     for key, value in hist_enc.history.items():
         file.create_dataset(key, data=value)
 
-(mae_2_train, mae_2_ci_train), (mrae_2_train, mrae_2_ci_train) = distances_errors(X_a_red_1, X_a_red_2.numpy())
-(mae_2_test, mae_2_ci_test), (mrae_2_test, mrae_2_ci_test) = distances_errors(X_b_red_1, X_b_red_2.numpy())
+results_2_a= distances_errors(X_a_red_1, X_a_red_2.numpy())
+results_2_b = distances_errors(X_b_red_1, X_b_red_2.numpy())
 
 # Approach 3: Nyström Extension
 X_a_red_3 = DM.fit_transform(X_a)
 eigenvalues = DM.lambdas[1:]**steps
 log_likelihood = log_likelihood_curve(eigenvalues)
 X_b_red_3 = DM.transform(X_b)
-(mae_3_train, mae_3_ci_train), (mrae_3_train, mrae_3_ci_train) = distances_errors(X_a_red_1, X_a_red_3)
-(mae_3_test, mae_3_ci_test), (mrae_3_test, mrae_3_ci_test) = distances_errors(X_b_red_1, X_b_red_3)
+results_3_a = distances_errors(X_a_red_1, X_a_red_3)
+results_3_b = distances_errors(X_b_red_1, X_b_red_3)
 
 P_a = DM.transition_probabilities(DM.W)
 if steps > 1:
@@ -103,53 +103,53 @@ D_a = DM.diffusion_distances(P_a, DM.pi)
 point = np.argmin(np.linalg.norm(X_a - np.array([0, -1, -15]), axis=1))
 P_color_a = np.array([my_colormap1D(x, c1=(0, 0, 0), c2=(0, 0.75, 0.75)) for x in normalize(P_a[:, point])])
 D_color_a = np.array([my_colormap1D(x, c1=(0, 0, 0), c2=(0.75, 0, 0.75)) for x in normalize(D_a[:, point])])
-P_color_a[point] = (0.72, 0.53, 0.05) # (0.75, 0, 0.75) 
-D_color_a[point] = (0.72, 0.53, 0.05) # (0, 0.75, 0.75)
+P_color_a[point] = (0.72, 0.53, 0.05)
+D_color_a[point] = (0.72, 0.53, 0.05)
 
-# Save results
+
 with h5py.File(os.path.join(output_dir, 'results.h5'), "w") as file:
-    group_hyperparameters = file.create_group("hyperparameters")
-    group_hyperparameters.create_dataset("n_components", data=n_components)
-    group_hyperparameters.create_dataset("q", data=q)
-    group_hyperparameters.create_dataset("alpha", data=alpha)
-    group_hyperparameters.create_dataset("steps", data=steps)
-    group_hyperparameters.create_dataset("sigma", data=sigma)
+    # Save hyperparameters without compression (small scalars)
+    file.create_group("hyperparameters")
+    file['hyperparameters'].create_dataset("n_components", data=n_components)
+    file['hyperparameters'].create_dataset("q", data=q)
+    file['hyperparameters'].create_dataset("alpha", data=alpha)
+    file['hyperparameters'].create_dataset("steps", data=steps)
+    file['hyperparameters'].create_dataset("sigma", data=sigma)
 
-    group_0 = file.create_group("original")
-    group_0.create_dataset("X_a", data=X_a, compression='gzip')
-    group_0.create_dataset("y_a", data=y_a, compression='gzip')
-    group_0.create_dataset("X_b", data=X_b, compression='gzip')
-    group_0.create_dataset("y_b", data=y_b, compression='gzip')
+    # Organize all data in a nested dictionary
+    data = {
+        'original': {
+            'train': {'X': X_a, 'y': y_a},
+            'test': {'X': X_b, 'y': y_b}
+        },
+        'diffusion_maps': {
+            'train': {'X_red': X_a_red_1},
+            'test': {'X_red': X_b_red_1}
+        },
+        'deep_diffusion_maps': {
+            'train': {'X_red': X_a_red_2, **results_2_a},
+            'test': {'X_red': X_b_red_2, **results_2_b}
+        },
+        'nystrom': {
+            'train': {
+                'X_red': X_a_red_3, 
+                'P_color': P_color_a,
+                'D_color': D_color_a,
+                'eigenvalues': eigenvalues,
+                'log_likelihood': log_likelihood,
+                **results_3_a
+            },
+            'test': {'X_red': X_b_red_3, **results_3_b}
+        }
+    }
 
-    group_1 = file.create_group("difussion_maps")
-    group_1.create_dataset("X_a_red", data=X_a_red_1, compression='gzip')
-    group_1.create_dataset("X_b_red", data=X_b_red_1, compression='gzip')
-
-    group_2 = file.create_group("deep_diffusion_maps")
-    group_2.create_dataset("X_a_red", data=X_a_red_2, compression='gzip')
-    group_2.create_dataset("X_b_red", data=X_b_red_2, compression='gzip')
-    group_2.create_dataset("mae_train", data=mae_2_train)
-    group_2.create_dataset("mae_conf_int_train", data=mae_2_ci_train)
-    group_2.create_dataset("mrae_train", data=mrae_2_train)
-    group_2.create_dataset("mrae_conf_int_train", data=mrae_2_ci_train)
-    group_2.create_dataset("mae_test", data=mae_2_test)
-    group_2.create_dataset("mae_conf_int_test", data=mae_2_ci_test)
-    group_2.create_dataset("mrae_test", data=mrae_2_test)
-    group_2.create_dataset("mrae_conf_int_test", data=mrae_2_ci_test)
-
-    group_3 = file.create_group("nystrom")
-    group_3.create_dataset("X_a_red", data=X_a_red_3, compression='gzip')
-    group_3.create_dataset("X_b_red", data=X_b_red_3, compression='gzip')
-    group_3.create_dataset("mae_train", data=mae_3_train)
-    group_3.create_dataset("mae_conf_int_train", data=mae_3_ci_train)
-    group_3.create_dataset("mrae_train", data=mrae_3_train)
-    group_3.create_dataset("mrae_conf_int_train", data=mrae_3_ci_train)
-    group_3.create_dataset("mae_test", data=mae_3_test)
-    group_3.create_dataset("mae_conf_int_test", data=mae_3_ci_test)
-    group_3.create_dataset("mrae_test", data=mrae_3_test)
-    group_3.create_dataset("mrae_conf_int_test", data=mrae_3_ci_test)
-    group_3.create_dataset("P_color_a", data=P_color_a, compression='gzip')
-    group_3.create_dataset("D_color_a", data=D_color_a, compression='gzip')
-    group_3.create_dataset("eigenvalues", data=eigenvalues)
-    group_3.create_dataset("log_likelihood", data=log_likelihood)
-
+    # Create the groups and datasets with compression for large arrays
+    for group_name, group_dict in data.items():
+        file.create_group(group_name)
+        for subset_name, subset_dict in group_dict.items():
+            file[group_name].create_group(subset_name)
+            for key, value in subset_dict.items():
+                if hasattr(data, 'shape') and len(data) > 1:
+                    file[group_name][subset_name].create_dataset(key, data=value, compression='gzip')
+                else:
+                    file[group_name][subset_name].create_dataset(key, data=value)

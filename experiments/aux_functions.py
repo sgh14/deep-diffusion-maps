@@ -4,6 +4,8 @@ from scipy.spatial.distance import pdist
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 from sklearn.neighbors import NearestNeighbors
+from matplotlib import ticker
+
 
 from DiffusionMaps import DiffusionMaps
 
@@ -71,7 +73,7 @@ def plot_eigenvalues_and_log_likelihood(
         )
         ax2.plot(
             n_components_vals,
-            log_likelihood_curves[i][:max_components],
+            log_likelihood_curves[i][:max_components]/np.max(log_likelihood_curves[i][:max_components]),
             color=colors[1],
             linestyle=linestyles[i]
         )
@@ -79,7 +81,7 @@ def plot_eigenvalues_and_log_likelihood(
     ax1.set_xlabel('$d$')
     ax1.set_ylabel('$\\lambda^t_d$', color=colors[0])
     ax1.tick_params(axis='y', labelcolor=colors[0])
-    ax2.set_ylabel('log-likelihood', color=colors[1])
+    ax2.set_ylabel('Normalized log-likelihood', color=colors[1])
     ax2.tick_params(axis='y', labelcolor=colors[1])
     # Create custom legends
     if len(eigenvalues_curves) > 1:
@@ -88,11 +90,14 @@ def plot_eigenvalues_and_log_likelihood(
             legend.values(),
             legend.keys(),
             loc='lower center',
-            bbox_to_anchor=(0.5, -0.05),
+            bbox_to_anchor=(0.5, -0.1),
             ncol=4,
             handletextpad=0.3,
             columnspacing=0.3
         )
+
+    ax1.ticklabel_format(axis='y', style='sci', scilimits=(-1, 1), useMathText=True)
+    ax2.ticklabel_format(axis='y', style='sci', scilimits=(-1, 1), useMathText=True)
 
     for format in ('.pdf',):# '.png', '.svg'):
         fig.savefig(os.path.join(output_dir, 'eigenvalues-log_likelihood' + format))
@@ -100,207 +105,6 @@ def plot_eigenvalues_and_log_likelihood(
     plt.close(fig)
 
 
-def plot_loglikelihood(X, q_vals, alpha_vals, steps_vals, output_dir='', max_components=None):
-    max_components = max_components if max_components else (X.shape[-1] - 1)
-    n_components_vals = np.arange(1, max_components + 1)
-    fig, axes = plt.subplots(len(alpha_vals), 1, figsize=(6, 1+3*len(alpha_vals)), sharex=True, sharey=True, squeeze=False)
-    for ax, alpha in zip(axes.flatten(), alpha_vals):
-        for j, q in enumerate(q_vals):
-            DM = DiffusionMaps(get_sigma(X, q), 1, 1, alpha)
-            _ = DM.fit_transform(X)
-            for k, steps in enumerate(steps_vals):
-                eigenvalues = DM.lambdas[1:]**steps
-                l_vals = log_likelihood_curve(eigenvalues, max_components)
-                normalized_l_vals = (l_vals-np.min(l_vals))/(np.max(l_vals)-np.min(l_vals))
-
-                ax.plot(n_components_vals, normalized_l_vals, color=colors[k], linestyle=linestyles[j])
-                if len(alpha_vals) > 1:
-                    ax.set_title(f'$\\alpha = {alpha}$')
-                ax.set_ylabel('Normalized log-likelihood')
-
-    ax.set_xlabel('$d$')
-    # ax.set_xticks(n_components_vals)
-    # Create custom legends
-    q_legend = {f'${q}$': Line2D([0], [0], linewidth=2, color='gray', linestyle=linestyles[i]) for i, q in enumerate(q_vals)}
-    steps_legend = {f'${steps}$': Line2D([0], [0], linewidth=2, color=colors[i]) for i, steps in enumerate(steps_vals)}
-    scale_factor = 2.5/len(alpha_vals)
-    if len(q_vals) > 1:
-        fig.legend(q_legend.values(), q_legend.keys(), title="Value of $q$", loc='lower center', bbox_to_anchor=(0.5, -0.05*scale_factor), ncol=6, handletextpad=0.3, columnspacing=0.3)
-    if len(steps_vals) > 1:
-        fig.legend(steps_legend.values(), steps_legend.keys(), title="Value of $t$", loc='lower center', bbox_to_anchor=(0.5, -(0.05*scale_factor + 0.08)), ncol=7, handletextpad=0.3, columnspacing=0.3, handlelength=2.5)
-    for format in ('.pdf',):# '.png', '.svg'):
-        fig.savefig(os.path.join(output_dir, 'l_values' + format))
-
-    plt.close(fig)
-
-
-def plot_eigenvalues(X, q_vals, alpha_vals, steps_vals, output_dir='', max_components=None, log_scale=False):
-    max_components = max_components if max_components else (X.shape[-1] - 1)
-    x = np.arange(1, max_components + 1)
-    fig, axes = plt.subplots(len(alpha_vals), 1, figsize=(6, 1+3*len(alpha_vals)), sharex=True, sharey=True, squeeze=False)
-    for ax, alpha in zip(axes.flatten(), alpha_vals):
-        for j, q in enumerate(q_vals):
-            DM = DiffusionMaps(get_sigma(X, q), 1, 1, alpha)
-            _ = DM.fit_transform(X)
-            for k, steps in enumerate(steps_vals):
-                eigenvalues = DM.lambdas[1:]**steps
-                y = np.log(eigenvalues[:max_components]) if log_scale else eigenvalues[:max_components]
-                ax.plot(x, y, color=colors[k], linestyle=linestyles[j])
-                if len(alpha_vals) > 1:
-                    ax.set_title(f'$\\alpha = {alpha}$')
-                ax.set_ylabel('$\\log(\\lambda^t)$' if log_scale else '$\\lambda^t$')
-
-    ax.set_xlabel('$d$')
-    # ax.set_xticks(x)
-    # Create custom legends
-    q_legend = {f'${q}$': Line2D([0], [0], linewidth=2, color='gray', linestyle=linestyles[i]) for i, q in enumerate(q_vals)}
-    steps_legend = {f'${steps}$': Line2D([0], [0], linewidth=2, color=colors[i]) for i, steps in enumerate(steps_vals)}
-    scale_factor = 3/len(alpha_vals)
-    if len(q_vals) > 1:
-        fig.legend(q_legend.values(), q_legend.keys(), title="Value of $q$", loc='lower center', bbox_to_anchor=(0.5, -0.05*scale_factor), ncol=6, handletextpad=0.3, columnspacing=0.3)
-    if len(steps_vals) > 1:
-        fig.legend(steps_legend.values(), steps_legend.keys(), title="Value of $t$", loc='lower center', bbox_to_anchor=(0.5, -(0.05*scale_factor + 0.08)), ncol=7, handletextpad=0.3, columnspacing=0.3, handlelength=2.5)
-    for format in ('.pdf',):# '.png', '.svg'):
-        fig.savefig(os.path.join(output_dir, 'eigenvalues' + format))
-    
-    plt.close(fig)
-
-
-def percentile_curve(distances):
-    q_vals = np.linspace(0, 1, 201)
-    percentiles = np.quantile(distances, q_vals)
-
-    return q_vals, percentiles
-
-
-def get_elements_above_diagonal(A):
-    # Get the indices of the upper triangle (excluding the diagonal)
-    rows, cols = np.triu_indices(A.shape[0], k=1)
-
-    # Extract the elements above the diagonal
-    upper_triangle_vector = A[rows, cols]
-
-    return upper_triangle_vector
-
-
-def my_colormap1D(x, c1=(0.75, 0, 0.75), c2=(0, 0.75, 0.75)):
-    # Calculate the RGB values based on interpolation
-    color = np.array(c1) * (1 - x) + np.array(c2) * x
-
-    return color
-
-
-def plot_distance_percentiles(X, q_vals, alpha_vals, steps_vals, output_dir=''):
-    D_euc = pdist(X, metric='euclidean')
-    x_euc, y_euc = percentile_curve(D_euc/np.max(D_euc))
-    fig, axes = plt.subplots(
-        len(alpha_vals),
-        len(steps_vals),
-        figsize=(3*len(steps_vals), 3*len(alpha_vals)),
-        sharex=True, sharey=True, squeeze=False
-    )
-    for i, alpha in enumerate(alpha_vals):
-        for k, steps in enumerate(steps_vals):
-            ax = axes[i, k]
-            ax.plot(x_euc, y_euc, color='black', linestyle='--')
-            for j, q in enumerate(q_vals):
-                DM = DiffusionMaps(get_sigma(X, q), 1, 1, alpha)
-                _ = DM.fit_transform(X)
-                P = DM.transition_probabilities(DM.W)
-                P_steps = np.linalg.matrix_power(P, steps)
-                D_diff = DM.diffusion_distances(P_steps, DM.pi)
-                x_diff, y_diff = percentile_curve(get_elements_above_diagonal(D_diff/np.max(D_diff)))
-                ax.plot(x_diff, y_diff, color=my_colormap1D(j/len(q_vals)), linestyle='-')
-                if len(alpha_vals) > 1:
-                    ax.set_title(f'$\\alpha = {alpha}$, $t = {steps}$')
-                
-                if k == 0:
-                    ax.set_ylabel('Normalized diffusion distance')
-                if i == len(alpha_vals) - 1:
-                    ax.set_xlabel('Percentile')
-
-    # ax.set_xticks(x)
-    # Create custom legends
-    q_legend = {f'${q}$': Line2D([0], [0], linewidth=2, color=my_colormap1D(i/len(q_vals)), linestyle='-') for i, q in enumerate(q_vals)}
-    if len(q_vals) > 1:
-        fig.legend(q_legend.values(), q_legend.keys(), title="Value of $q$", loc='lower center', bbox_to_anchor=(0.5, -0.05), ncol=6, handletextpad=0.3, columnspacing=0.3)
-    for format in ('.pdf',):# '.png', '.svg'):
-        fig.savefig(os.path.join(output_dir, 'distances' + format))
-    
-    plt.close(fig)
-
-
-# def plot_distance_percentiles(X, q_vals, alpha_vals, steps_vals, output_dir=''):
-#     D_euc = pdist(X, metric='euclidean')
-#     x_euc, y_euc = percentile_curve(D_euc/np.max(D_euc))
-#     fig, axes = plt.subplots(len(alpha_vals), 1, figsize=(6, 1+3*len(alpha_vals)), sharex=True, sharey=True, squeeze=False)
-#     for ax, alpha in zip(axes.flatten(), alpha_vals):
-#         ax2 = ax.twinx()
-#         ax2.plot(x_euc, y_euc, color='red', linestyle='-')
-#         ax2.set_ylabel('Normalized euclidean distance', color='red')
-#         for j, q in enumerate(q_vals):
-#             DM = DiffusionMaps(get_sigma(X, q), 1, 1, alpha)
-#             _ = DM.fit_transform(X)
-#             P = DM.transition_probabilities(DM.W)
-#             for k, steps in enumerate(steps_vals):
-#                 P_steps = np.linalg.matrix_power(P, steps)
-#                 D_diff = DM.diffusion_distances(P_steps, DM.pi)
-#                 x_diff, y_diff = percentile_curve(get_elements_above_diagonal(D_diff/np.max(D_diff)))
-#                 ax.plot(x_diff, y_diff, color=colors[k], linestyle=linestyles[j])
-#                 if len(alpha_vals) > 1:
-#                     ax.set_title(f'$\\alpha = {alpha}$')
-#                 ax.set_ylabel('Normalized diffusion distance')
-
-#     ax.set_xlabel('Percentile')
-#     # ax.set_xticks(x)
-#     # Create custom legends
-#     q_legend = {f'${q}$': Line2D([0], [0], linewidth=2, color='gray', linestyle=linestyles[i]) for i, q in enumerate(q_vals)}
-#     steps_legend = {f'${steps}$': Line2D([0], [0], linewidth=2, color=colors[i]) for i, steps in enumerate(steps_vals)}
-#     scale_factor = 3/len(alpha_vals)
-#     if len(q_vals) > 1:
-#         fig.legend(q_legend.values(), q_legend.keys(), title="Value of $q$", loc='lower center', bbox_to_anchor=(0.5, -0.05*scale_factor), ncol=6, handletextpad=0.3, columnspacing=0.3)
-#     if len(steps_vals) > 1:
-#         fig.legend(steps_legend.values(), steps_legend.keys(), title="Value of $t$", loc='lower center', bbox_to_anchor=(0.5, -(0.05*scale_factor + 0.08)), ncol=7, handletextpad=0.3, columnspacing=0.3, handlelength=2.5)
-#     for format in ('.pdf',):# '.png', '.svg'):
-#         fig.savefig(os.path.join(output_dir, 'distances' + format))
-    
-#     plt.close(fig)
-
-
-def levina_bickel_estimator(X, k):
-    """
-    Estimate the intrinsic dimension of a dataset X using the Levina–Bickel estimator.
-    """
-    nbrs = NearestNeighbors(n_neighbors=k).fit(X)
-    distances, _ = nbrs.kneighbors(X)
-    d_estimates = []
-    # For each point, ignore the zero distance (itself) and use the k-th nearest neighbor.
-    for i in range(X.shape[0]):
-        # Exclude the first distance which is zero.
-        distances_i = distances[i, 1:]
-        if distances_i[-1] == 0:
-            d_estimates.append(np.nan)
-            continue
-        # Levina–Bickel formula: inverse of the mean log-ratio of the distances.
-        d_local = 1.0 / np.mean(np.log(distances_i[-1] / distances_i[:-1]))
-        d_estimates.append(d_local)
-    
-    mean_d = np.mean(d_estimates)
-        
-    return mean_d
-
-
-def plot_intrinsic_dimension_estimation(X, k_max, output_dir=''):
-    k_vals = np.arange(5, k_max + 1)
-    d_vals = np.array([levina_bickel_estimator(X, k) for k in k_vals])
-    fig, ax = plt.subplots()
-    ax.plot(k_vals, d_vals, color=colors[0], linestyle='-')
-    ax.set_xlabel('$k$')
-    ax.set_ylabel('$d$')
-    for format in ('.pdf',):# '.png', '.svg'):
-        fig.savefig(os.path.join(output_dir, 'intrinsic_dimension' + format))
-    
-    plt.close(fig)
 
 
 def plot_history(history, output_dir, filename, logy=False, logx=False):
@@ -328,3 +132,43 @@ def plot_history(history, output_dir, filename, logy=False, logx=False):
             fig.savefig(os.path.join(output_dir, filename + '-' + key + format))
         
         plt.close(fig)
+
+
+def plot_mre_by_decile(decile_distances, mre_by_decile, labels, output_dir, filename):
+    os.makedirs(output_dir, exist_ok=True)
+    decile_points = list(range(0, 101, 10))
+    x_pos = np.arange(len(decile_points) - 1) + 0.5
+    fig, ax1 = plt.subplots()
+    ax2 = ax1.twiny()
+    for i in range(len(mre_by_decile)):
+        bars = ax1.bar(x_pos, mre_by_decile[i], width=1.0, edgecolor=colors[i], facecolor='white', label=labels[i], linewidth=2.0)
+        
+        # for bar in bars:
+        #     xlims = [bar.get_x(), bar.get_x() + bar.get_width()]
+        #     ylims = [bar.get_height(), bar.get_height()]
+        #     plt.plot(xlims, ylims, color=colors[i], linewidth=2, label=labels[i])
+
+    # Set x-axis ticks and labels
+    # ax1.ticklabel_format(axis='y', style='sci', scilimits=(-1, 1), useMathText=True)
+    ax1.set_xticks(np.arange(len(decile_points)))
+    ax1.set_xticklabels(decile_points)
+    ax1.set_xlim(0, len(decile_points) - 1)
+
+    # Set the top x-axis with d values
+    # ax2.ticklabel_format(axis='x', style='sci', scilimits=(-1, 1), useMathText=True)
+    ax2.set_xticks(np.arange(len(decile_distances)))
+    ax2.set_xticklabels([f"${d:.1e}$" for d in decile_distances])
+    # ax2.set_xticklabels(decile_distances)
+    ax2.set_xlim(0, len(decile_distances) - 1)
+    ax2.tick_params(axis='x', labelrotation=90)
+    # formatter = ticker.ScalarFormatter(useMathText=True)
+    # formatter.set_scientific(True)
+    # formatter.set_powerlimits((-1, 1))
+    # ax2.xaxis.set_major_formatter(formatter)
+
+    ax1.set_xlabel('Decile')
+    ax1.set_ylabel('MRE')
+    ax2.set_xlabel('Euclidean distance in the embedding')
+    ax1.legend()
+    for format in ('.pdf',):# '.png', '.svg'):
+        fig.savefig(os.path.join(output_dir, filename + format))

@@ -2,6 +2,42 @@ import numpy as np
 from scipy.spatial.distance import pdist
 
 
+def get_deciles(x):
+    """
+    Calculate the deciles of a sample.
+    
+    Parameters:
+    - x: array-like, sample
+    
+    Returns:
+    - deciles: list, deciles of the sample
+    """
+    deciles = np.percentile(x, np.arange(0, 101, 10))
+    
+    return deciles
+
+
+def get_mean_value_by_decile(x, y):
+    """
+    Calculate the mean value of y for each decile of x.
+    
+    Parameters:
+    - x: array-like, sample
+    - y: array-like, values to average
+    
+    Returns:
+    - deciles: list, deciles of x
+    - mean_values: list, mean values of y for each decile of x
+    """
+    deciles = get_deciles(x)
+    mean_values = []
+    for i in range(len(deciles) - 1):
+        mask = (x >= deciles[i]) & (x < deciles[i + 1])
+        mean_values.append(np.mean(y[mask]))
+    
+    return deciles, mean_values
+
+
 def bootstrap_ci(x, conf_level=0.95):
     """
     Calculate the confidence interval of a sample using bootstrap.
@@ -43,12 +79,12 @@ def mae(x_true, x_pred, conf_level=0.95):
     mean = np.mean(errors)
     conf_int = bootstrap_ci(errors, conf_level)
 
-    return mean, conf_int
+    return errors, mean, conf_int
 
 
-def mrae(x_true, x_pred, conf_level=0.95):
+def mre(x_true, x_pred, conf_level=0.95):
     """
-    Mean Relative Absolute Error (MRAE) with confidence interval calculation.
+    Mean Relative Absolute Error (mre) with confidence interval calculation.
     
     Parameters:
     - x_true: array-like, true values
@@ -56,19 +92,19 @@ def mrae(x_true, x_pred, conf_level=0.95):
     - conf_level: float, confidence level for the interval
     
     Returns:
-    - mean: float, the MRAE
-    - conf_int: tuple, confidence interval for MRAE
+    - mean: float, the mre
+    - conf_int: tuple, confidence interval for mre
     """
     errors = np.abs(x_true - x_pred) / np.abs(x_true)
     mean = np.mean(errors)
     conf_int = bootstrap_ci(errors, conf_level)
 
-    return mean, conf_int
+    return errors, mean, conf_int
 
 
 def distances_errors(x_true, x_pred, conf_level=0.95):
     """
-    Calculate the Mean Absolute Error (MAE) and Mean Relative Absolute Error (MRAE) between two sets of points.
+    Calculate the Mean Absolute Error (MAE) and Mean Relative Absolute Error (mre) between two sets of points.
     
     Parameters:
     - x_true: array-like, true values
@@ -78,12 +114,24 @@ def distances_errors(x_true, x_pred, conf_level=0.95):
     Returns:
     - mae_mean: float, the MAE
     - mae_conf_int: tuple, confidence interval for MAE
-    - mrae_mean: float, the MRAE
-    - mrae_conf_int: tuple, confidence interval for MRAE
+    - mre_mean: float, the mre
+    - mre_conf_int: tuple, confidence interval for mre
     """
     dists_true = pdist(x_true.reshape((x_true.shape[0], -1)), metric='euclidean')
     dists_pred = pdist(x_pred.reshape((x_pred.shape[0], -1)), metric='euclidean')
-    mae_mean, mae_conf_int = mae(dists_true, dists_pred, conf_level)
-    mrae_mean, mrae_conf_int = mrae(dists_true, dists_pred, conf_level)
+    mae_vals, mae_mean, mae_conf_int = mae(dists_true, dists_pred, conf_level)
+    mre_vals, mre_mean, mre_conf_int = mre(dists_true, dists_pred, conf_level)
+    decile_distances, mae_by_decile = get_mean_value_by_decile(dists_true, mae_vals)
+    _, mre_by_decile = get_mean_value_by_decile(dists_true, mre_vals)
 
-    return (mae_mean, mae_conf_int), (mrae_mean, mrae_conf_int)
+    results = {
+        'decile_distances': decile_distances,
+        'mae_by_decile': mae_by_decile,
+        'mae_mean': mae_mean,
+        'mae_conf_int': mae_conf_int,
+        'mre_by_decile': mre_by_decile,
+        'mre_mean': mre_mean,
+        'mre_conf_int': mre_conf_int
+    }
+
+    return results

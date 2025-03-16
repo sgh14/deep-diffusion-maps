@@ -3,11 +3,6 @@ data:
   split: 0.5
   noise: 0.0
   seed: 123
-hyperparameters_search:
-  max_components: 25
-  quantile_values: [5.0e-3, 1.0e-2, 5.0e-2, 1.0e-1]
-  alpha_values: [0, 1]
-  steps_values: [1, 4, 16, 64]
 diffusion_maps:
   n_components: 2
   quantile: 3.0e-2
@@ -15,8 +10,8 @@ diffusion_maps:
   steps: 100
 encoder:
   units: 128
-  epochs: 1000
-  batch_size: 128
+  epochs: 5000
+  batch_size: 512
   learning_rate: 0.01
   validation_split: 0.1
   batch_normalization: False

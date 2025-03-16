@@ -7,9 +7,10 @@
 #SBATCH --job-name=s_curve
 #SBATCH --output=s_curve.out
 
-# conda activate dm_nys
+# Activate your conda environment
+source ~/miniconda3/bin/activate
+conda activate ddm
 
 printf "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\nEXPERIMENT: S CURVE\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n"
-python -m experiments.s_curve.hyperparameters_search -c experiments/s_curve/config.yml
 python -m experiments.s_curve.experiment -c experiments/s_curve/config.yml
 python -m experiments.s_curve.plot_results -c experiments/s_curve/config.yml

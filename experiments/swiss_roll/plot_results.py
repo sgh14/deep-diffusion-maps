@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 import argparse
 import yaml
 
-from experiments.aux_functions import plot_eigenvalues_and_log_likelihood, plot_history
+from experiments.aux_functions import plot_eigenvalues_and_log_likelihood, plot_history, plot_mre_by_decile
 
 plt.style.use('experiments/science.mplstyle')
 
@@ -70,12 +70,12 @@ def plot_projection(X, y, output_dir, filename):
             for dim2 in range(dim1 + 1, ndims):
                 fig, ax = plt.subplots(figsize=(3, 3), constrained_layout=True)
                 ax.scatter(X[:, dim1], X[:, dim2], c=y)
-                # # Remove the ticks
-                # ax.set_xticks([])
-                # ax.set_yticks([])
-                # # Remove the tick labels
-                # ax.set_xticklabels([])
-                # ax.set_yticklabels([])
+                # Remove the ticks
+                ax.set_xticks([])
+                ax.set_yticks([])
+                # Remove the tick labels
+                ax.set_xticklabels([])
+                ax.set_yticklabels([])
                 # ax.set_xlabel(r'$\Psi_1$')
                 # ax.set_ylabel(r'$\Psi_2$')
                 ax = set_equal_ranges(ax, max_range) # ax.set_box_aspect(1)
@@ -87,12 +87,12 @@ def plot_projection(X, y, output_dir, filename):
     else:
         fig, ax = plt.subplots(figsize=(3, 3), constrained_layout=True)
         ax.scatter(X[:, 0], np.zeros(X.shape[0]), c=y)
-        # # Remove the ticks
-        # ax.set_xticks([])
-        # ax.set_yticks([])
-        # # Remove the tick labels
-        # ax.set_xticklabels([])
-        # ax.set_yticklabels([])
+        # Remove the ticks
+        ax.set_xticks([])
+        ax.set_yticks([])
+        # Remove the tick labels
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
         # ax.set_xlabel(r'$\Psi_1$')
         # ax.set_ylabel(r'$\Psi_2$')
         ax = set_equal_ranges(ax, max_range) # ax.set_box_aspect(1)
@@ -126,44 +126,31 @@ output_dir = os.path.join(root, experiment)
 with h5py.File(os.path.join(output_dir, 'hist_enc.h5'), 'r') as file:
     history = {key: np.array(file[key]) for key in file.keys()}
 
-plot_history(history, output_dir, 'hist_enc', logy=True, logx=True)
+plot_history(history, output_dir, 'hist_enc', logy=True, logx=False)
 
-# Load data from the HDF5 file
 with h5py.File(os.path.join(output_dir, 'results.h5'), "r") as file:
-    # Load original data
-    group_0 = file["original"]
-    X_a = np.array(group_0["X_a"][:])
-    y_a = np.array(group_0["y_a"][:])
-    X_b = np.array(group_0["X_b"][:])
-    y_b = np.array(group_0["y_b"][:])
+    for subset in ('train', 'test'):
+        X = np.array(file["original"][subset]["X"][:])
+        y = np.array(file["original"][subset]["y"][:])
+        plot_original(X, y, output_dir, f'original_{subset}')
 
-    # Load data for approach 1
-    group_1 = file["difussion_maps"]
-    X_a_red_1 = np.array(group_1["X_a_red"][:])
-    X_b_red_1 = np.array(group_1["X_b_red"][:])
+        mre_by_decile = []
+        for method in ('diffusion_maps', 'deep_diffusion_maps', 'nystrom'):
+            X_red = np.array(file[method][subset]["X_red"][:])
+            plot_projection(X_red, y, output_dir, f'projection_{method}_{subset}')
+            if method != 'diffusion_maps':
+                decile_distances = np.array(file[method][subset]["decile_distances"][:])
+                mre_by_decile.append(np.array(file[method][subset]["mre_by_decile"][:]))
+            
+        plot_mre_by_decile(decile_distances, mre_by_decile, ['DDM', 'Nystrom'], output_dir, f'mre_dist_{subset}')
+        
+        if subset == 'train':
+            P_color = np.array(file['nystrom'][subset]["P_color"][:])
+            D_color = np.array(file['nystrom'][subset]["D_color"][:])
+            eigenvalues = np.array(file['nystrom'][subset]["eigenvalues"][:])
+            log_likelihood = np.array(file['nystrom'][subset]["log_likelihood"][:])
 
-    # Load data for approach 2
-    group_2 = file["deep_diffusion_maps"]
-    X_a_red_2 = np.array(group_2["X_a_red"][:])
-    X_b_red_2 = np.array(group_2["X_b_red"][:])
-
-    # Load data for approach 3
-    group_3 = file["nystrom"]
-    X_a_red_3 = np.array(group_3["X_a_red"][:])
-    X_b_red_3 = np.array(group_3["X_b_red"][:])
-    P_color_a = np.array(group_3["P_color_a"][:])
-    D_color_a = np.array(group_3["D_color_a"][:])
-    eigenvalues = np.array(group_3["eigenvalues"][:])
-    log_likelihood = np.array(group_3["log_likelihood"][:])
+            plot_original(X, P_color, output_dir, f'probs_{subset}')
+            plot_original(X, D_color, output_dir, f'dists_{subset}')
+            plot_eigenvalues_and_log_likelihood([eigenvalues], [log_likelihood], ['Swiss Roll'], output_dir)
     
-plot_original(X_a, y_a, output_dir, 'orig_a')
-plot_original(X_b, y_b, output_dir, 'orig_b')
-plot_original(X_a, P_color_a, output_dir, 'probs_a')
-plot_original(X_a, D_color_a, output_dir, 'dists_a')
-plot_projection(X_a_red_1, y_a, output_dir, 'red_a_dm')
-plot_projection(X_a_red_2, y_a, output_dir, 'red_a_ddm')
-plot_projection(X_a_red_3, y_a, output_dir, 'red_a_nys')
-plot_projection(X_b_red_1, y_b, output_dir, 'red_b_dm')
-plot_projection(X_b_red_2, y_b, output_dir, 'red_b_ddm')
-plot_projection(X_b_red_3, y_b, output_dir, 'red_b_nys')
-plot_eigenvalues_and_log_likelihood([eigenvalues], [log_likelihood], ['Swiss Roll'], output_dir)
