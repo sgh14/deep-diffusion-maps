@@ -26,7 +26,7 @@ class DiffusionLoss(tf.keras.losses.Loss):
         W = self._normalize_by_degree(K, d_K, d_K, self.alpha)
         d_W = self._degree_vector(W)
         # Compute the stationary distribution
-        pi = self._stationary_dist(d_W)
+        pi = self._stationary_distribution(d_W)
         # Compute the matrix A
         A = self._normalize_by_degree(W, d_W, d_W, 0.5)
         # Compute A^{2t}
@@ -64,7 +64,7 @@ class DiffusionLoss(tf.keras.losses.Loss):
 
 
     @staticmethod
-    def _stationary_dist(d):
+    def _stationary_distribution(d):
         pi = d / np.sum(d)
 
         return pi

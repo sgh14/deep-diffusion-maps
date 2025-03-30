@@ -3,11 +3,9 @@ import numpy as np
 from scipy.spatial.distance import pdist
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
-from sklearn.neighbors import NearestNeighbors
-from matplotlib import ticker
 
 
-from DiffusionMaps import DiffusionMaps
+from diffusionmaps import DiffusionMaps
 
 
 plt.style.use('experiments/science.mplstyle')
@@ -103,8 +101,6 @@ def plot_eigenvalues_and_log_likelihood(
         fig.savefig(os.path.join(output_dir, 'eigenvalues-log_likelihood' + format))
 
     plt.close(fig)
-
-
 
 
 def plot_history(history, output_dir, filename, logy=False, logx=False):

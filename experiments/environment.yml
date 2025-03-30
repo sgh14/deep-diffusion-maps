@@ -4,7 +4,6 @@ dependencies:
   - numpy == 1.26.4
   - matplotlib == 3.7.1
   - pandas == 2.2.2
-  # - numba == 0.60.0
   - h5py == 3.11.0
   - pip
   - pip:
@@ -13,4 +12,5 @@ dependencies:
     - scikit-fda == 0.9.1
     - scipy == 1.14.1
     - PyYAML == 6.0.2
+    - git+https://github.com/sgh14/diffusion-maps-with-nystrom.git
 

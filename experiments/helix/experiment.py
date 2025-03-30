@@ -5,8 +5,8 @@ import argparse
 import yaml
 from tensorflow.keras.optimizers import Adam
 
-from DiffusionLoss import DiffusionLoss
-from DiffusionMaps import DiffusionMaps
+from diffusionloss import DiffusionLoss
+from diffusionmaps import DiffusionMaps
 from experiments.aux_functions import get_sigma, log_likelihood_curve
 from experiments.helix.load_data import get_datasets, my_colormap1D, normalize
 from experiments.metrics import distances_errors
