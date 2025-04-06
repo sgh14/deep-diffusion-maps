@@ -171,19 +171,19 @@ The experiments produce several outputs:
 <div style="display: flex; justify-content: space-around;">
   <div style="text-align: center;">
     <p>Original: Test set</p>
-    <img src="results/swiss_roll/original_test.png" alt="Image 1" style="width: 200px; height: auto;">
+    <img src="results/swiss_roll/original_test.png" alt="Image 1" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Diffusion Maps</p>
-    <img src="results/swiss_roll/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 200px; height: auto;">
+    <img src="results/swiss_roll/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Deep Diffusion Maps</p>
-    <img src="results/swiss_roll/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 200px; height: auto;">
+    <img src="results/swiss_roll/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Nyström</p>
-    <img src="results/swiss_roll/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 200px; height: auto;">
+    <img src="results/swiss_roll/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 100px; height: auto;">
   </div>
 </div>
 
@@ -191,19 +191,19 @@ The experiments produce several outputs:
 <div style="display: flex; justify-content: space-around;">
   <div style="text-align: center;">
     <p>Original: Test set</p>
-    <img src="results/s_curve/original_test.png" alt="Image 1" style="width: 200px; height: auto;">
+    <img src="results/s_curve/original_test.png" alt="Image 1" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Diffusion Maps</p>
-    <img src="results/s_curve/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 200px; height: auto;">
+    <img src="results/s_curve/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Deep Diffusion Maps</p>
-    <img src="results/s_curve/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 200px; height: auto;">
+    <img src="results/s_curve/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Nyström</p>
-    <img src="results/s_curve/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 200px; height: auto;">
+    <img src="results/s_curve/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 100px; height: auto;">
   </div>
 </div>
 
@@ -211,19 +211,19 @@ The experiments produce several outputs:
 <div style="display: flex; justify-content: space-around;">
   <div style="text-align: center;">
     <p>Original: Test set</p>
-    <img src="results/helix/original_test.png" alt="Image 1" style="width: 200px; height: auto;">
+    <img src="results/helix/original_test.png" alt="Image 1" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Diffusion Maps</p>
-    <img src="results/helix/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 200px; height: auto;">
+    <img src="results/helix/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Deep Diffusion Maps</p>
-    <img src="results/helix/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 200px; height: auto;">
+    <img src="results/helix/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Nyström</p>
-    <img src="results/helix/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 200px; height: auto;">
+    <img src="results/helix/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 100px; height: auto;">
   </div>
 </div>
 
@@ -231,19 +231,19 @@ The experiments produce several outputs:
 <div style="display: flex; justify-content: space-around;">
   <div style="text-align: center;">
     <p>Original: Test set</p>
-    <img src="results/phoneme/original_test.png" alt="Image 1" style="width: 200px; height: auto;">
+    <img src="results/phoneme/original_test.png" alt="Image 1" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Diffusion Maps</p>
-    <img src="results/phoneme/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 200px; height: auto;">
+    <img src="results/phoneme/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Deep Diffusion Maps</p>
-    <img src="results/phoneme/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 200px; height: auto;">
+    <img src="results/phoneme/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Nyström</p>
-    <img src="results/phoneme/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 200px; height: auto;">
+    <img src="results/phoneme/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 100px; height: auto;">
   </div>
 </div>
 
@@ -251,19 +251,19 @@ The experiments produce several outputs:
 <div style="display: flex; justify-content: space-around;">
   <div style="text-align: center;">
     <p>Original: Test set</p>
-    <img src="results/mnist_d_2/original_test.png" alt="Image 1" style="width: 200px; height: auto;">
+    <img src="results/mnist_d_2/original_test.png" alt="Image 1" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Diffusion Maps</p>
-    <img src="results/mnist_d_2/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 200px; height: auto;">
+    <img src="results/mnist_d_2/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Deep Diffusion Maps</p>
-    <img src="results/mnist_d_2/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 200px; height: auto;">
+    <img src="results/mnist_d_2/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 100px; height: auto;">
   </div>
   <div style="text-align: center;">
     <p>Projection: Nyström</p>
-    <img src="results/mnist_d_2/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 200px; height: auto;">
+    <img src="results/mnist_d_2/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 100px; height: auto;">
   </div>
 </div>
 
