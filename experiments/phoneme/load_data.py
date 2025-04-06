@@ -1,28 +1,45 @@
 import numpy as np
+from typing import Dict
 from sklearn.model_selection import train_test_split
 from skfda import datasets
 
 
-def get_datasets(split=0.5, seed=123, noise=0.5):
+def get_data(
+        split: float=0.5, 
+        seed: int=123,
+        noise: float=0
+) -> Dict[str, Dict[str, np.ndarray]]:
+    """
+    Load the Phoneme dataset, optionally add noise, and split it into training and test sets.
+
+    This function fetches the Phoneme dataset using scikit-fda, optionally adds Gaussian noise to the data,
+    and splits it into training and test sets.
+
+    Parameters:
+        split (float): Proportion of points to use for the test set (default: 0.5).
+        seed (int): Random seed for reproducibility (default: 123).
+        noise (float): Standard deviation of Gaussian noise added to the data (default: 0).
+
+    Returns:
+        dict: Dictionary containing:
+            - 'train': Dictionary with keys 'X' (data matrix) and 'y' (labels)
+            - 'test': Dictionary with keys 'X' (data matrix) and 'y' (labels)
+    """
     n_points = 150
     np.random.seed(seed)
     X, y = datasets.fetch_phoneme(return_X_y=True)
-    # new_points = X.grid_points[0][:n_points]
-    # new_data = X.data_matrix[:, :n_points]
-    # X = X.copy(
-    #     grid_points=new_points,
-    #     data_matrix=new_data,
-    #     domain_range=(np.min(new_points), np.max(new_points)),
-    # )
-    # X = X(np.linspace(*domain_range, 128))
     X = X.data_matrix[:, :n_points]
     if noise > 0:
         X = X + np.random.normal(loc=0.0, scale=noise, size=X.shape)
 
+    # Split the dataset into training and test sets
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=split, stratify=y, random_state=seed, shuffle=True
     )
-    data_train = (X_train, y_train)
-    data_test = (X_test, y_test)
+    # Create the dictionary structure for the result
+    data = {
+        'train': {'X': X_train, 'y': y_train},
+        'test': {'X': X_test, 'y': y_test}
+    }
 
-    return data_train, data_test
+    return data

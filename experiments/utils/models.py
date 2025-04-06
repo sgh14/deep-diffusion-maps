@@ -11,9 +11,8 @@ class EncoderHead(Layer):
         self.dense = None  # Initialize in build
 
     def build(self, input_shape):
-        """This method initializes the weights once the input shape is known."""
         self.dense = Dense(self.n_components, activation='linear', use_bias=not self.use_bn)
-        super().build(input_shape)  # Important: Call the parent build method
+        super().build(input_shape)
 
     def call(self, inputs, training=False):
         if self.use_bn:
