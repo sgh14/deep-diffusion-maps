@@ -168,121 +168,124 @@ The experiments produce several outputs:
 ### Example visualizations
 
 #### Swiss Roll
-<div style="display: flex; justify-content: space-around;">
-  <div style="text-align: center;">
-    <p>Original (test)</p>
-    <img src="results/swiss_roll/original_test.png" alt="Image 1" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Diffusion Maps</p>
-    <img src="results/swiss_roll/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Deep Diffusion Maps</p>
-    <img src="results/swiss_roll/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Nyström</p>
-    <img src="results/swiss_roll/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 100px; height: auto;">
-  </div>
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="25%">
+        <img src="results/swiss_roll/original_test.png" alt="Original Test" width="100%"><br>
+        <b>Original (test)</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/swiss_roll/projection_diffusion_maps_test_dims_1_2.png" alt="Diffusion Maps" width="100%"><br>
+        <b>Diffusion Maps</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/swiss_roll/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Deep Diffusion Maps" width="100%"><br>
+        <b>Deep Diffusion Maps</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/swiss_roll/projection_nystrom_test_dims_1_2.png" alt="Nyström" width="100%"><br>
+        <b>Nyström</b>
+      </td>
+    </tr>
+  </table>
 </div>
 
 #### S Curve
-<div style="display: flex; justify-content: space-around;">
-  <div style="text-align: center;">
-    <p>Original (test)</p>
-    <img src="results/s_curve/original_test.png" alt="Image 1" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Diffusion Maps</p>
-    <img src="results/s_curve/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Deep Diffusion Maps</p>
-    <img src="results/s_curve/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Nyström</p>
-    <img src="results/s_curve/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 100px; height: auto;">
-  </div>
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="25%">
+        <img src="results/s_curve/original_test.png" alt="Original Test" width="100%"><br>
+        <b>Original (test)</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/s_curve/projection_diffusion_maps_test_dims_1_2.png" alt="Diffusion Maps" width="100%"><br>
+        <b>Diffusion Maps</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/s_curve/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Deep Diffusion Maps" width="100%"><br>
+        <b>Deep Diffusion Maps</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/s_curve/projection_nystrom_test_dims_1_2.png" alt="Nyström" width="100%"><br>
+        <b>Nyström</b>
+      </td>
+    </tr>
+  </table>
 </div>
 
 #### Helix
-<div style="display: flex; justify-content: space-around;">
-  <div style="text-align: center;">
-    <p>Original (test)</p>
-    <img src="results/helix/original_test.png" alt="Image 1" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Diffusion Maps</p>
-    <img src="results/helix/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Deep Diffusion Maps</p>
-    <img src="results/helix/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Nyström</p>
-    <img src="results/helix/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 100px; height: auto;">
-  </div>
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="25%">
+        <img src="results/helix/original_test.png" alt="Original Test" width="100%"><br>
+        <b>Original (test)</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/helix/projection_diffusion_maps_test_dims_1_2.png" alt="Diffusion Maps" width="100%"><br>
+        <b>Diffusion Maps</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/helix/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Deep Diffusion Maps" width="100%"><br>
+        <b>Deep Diffusion Maps</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/helix/projection_nystrom_test_dims_1_2.png" alt="Nyström" width="100%"><br>
+        <b>Nyström</b>
+      </td>
+    </tr>
+  </table>
 </div>
 
 #### Phoneme
-<div style="display: flex; justify-content: space-around;">
-  <div style="text-align: center;">
-    <p>Original (test)</p>
-    <img src="results/phoneme/original_test.png" alt="Image 1" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Diffusion Maps</p>
-    <img src="results/phoneme/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Deep Diffusion Maps</p>
-    <img src="results/phoneme/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Nyström</p>
-    <img src="results/phoneme/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 100px; height: auto;">
-  </div>
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="25%">
+        <img src="results/phoneme/original_test.png" alt="Original Test" width="100%"><br>
+        <b>Original (test)</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/phoneme/projection_diffusion_maps_test_dims_1_2.png" alt="Diffusion Maps" width="100%"><br>
+        <b>Diffusion Maps</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/phoneme/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Deep Diffusion Maps" width="100%"><br>
+        <b>Deep Diffusion Maps</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/phoneme/projection_nystrom_test_dims_1_2.png" alt="Nyström" width="100%"><br>
+        <b>Nyström</b>
+      </td>
+    </tr>
+  </table>
 </div>
 
 #### MNIST
-<div style="display: flex; justify-content: space-around;">
-  <div style="text-align: center;">
-    <p>Original (test)</p>
-    <img src="results/mnist_d_2/original_test.png" alt="Image 1" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Diffusion Maps</p>
-    <img src="results/mnist_d_2/projection_diffusion_maps_test_dims_1_2.png" alt="Image 2" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Deep Diffusion Maps</p>
-    <img src="results/mnist_d_2/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Image 3" style="width: 100px; height: auto;">
-  </div>
-  <div style="text-align: center;">
-    <p>Nyström</p>
-    <img src="results/mnist_d_2/projection_nystrom_test_dims_1_2.png" alt="Image 4" style="width: 100px; height: auto;">
-  </div>
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="25%">
+        <img src="results/mnist_d_2/original_test.png" alt="Original Test" width="100%"><br>
+        <b>Original (test)</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/mnist_d_2/projection_diffusion_maps_test_dims_1_2.png" alt="Diffusion Maps" width="100%"><br>
+        <b>Diffusion Maps</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/mnist_d_2/projection_deep_diffusion_maps_test_dims_1_2.png" alt="Deep Diffusion Maps" width="100%"><br>
+        <b>Deep Diffusion Maps</b>
+      </td>
+      <td align="center" width="25%">
+        <img src="results/mnist_d_2/projection_nystrom_test_dims_1_2.png" alt="Nyström" width="100%"><br>
+        <b>Nyström</b>
+      </td>
+    </tr>
+  </table>
 </div>
-
-<!-- ## Implementation Details
-
-### DiffusionLoss
-
-The core of our implementation is the `DiffusionLoss` class, which computes the diffusion loss for training neural networks:
-
-```python
-loss = DiffusionLoss(
-    X=X_train,          # Training data
-    sigma=sigma,        # Kernel bandwidth
-    steps=steps,        # Number of diffusion steps
-    alpha=alpha         # Alpha parameter for normalization
-)
-```
-
-The loss function compares the Gram matrix of the scaled embeddings with the precomputed diffusion matrix, encouraging the neural network to learn embeddings that preserve the diffusion distance. -->
 
 ## References
 
