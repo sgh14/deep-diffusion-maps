@@ -9,7 +9,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import History
 
-from diffusionloss import DiffusionLoss
+from src.diffusionloss import DiffusionLoss
 from diffusionmaps import DiffusionMaps
 from experiments.utils.plots import colormap1D, normalize
 from experiments.utils.metrics import distances_errors

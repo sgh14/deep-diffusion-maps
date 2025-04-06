@@ -299,4 +299,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-For questions or feedback, please contact [Your Name] at [Your Email].
+If you have any questions or comments, please do not hesitate to contact us.
