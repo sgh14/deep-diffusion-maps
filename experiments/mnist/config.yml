@@ -9,11 +9,17 @@ diffusion_maps:
   alpha: 0
   steps: 1
 encoder:
-  filters: 16 # quitar capa densa intermedia
-  epochs: 10000
-  batch_size: 512
-  learning_rate: 0.01
-  validation_split: 0.1
-  batch_normalization: False
-  dropout: 0.0
+  architecture:
+    filters: 16
+    use_bn: False
+    dropout: 0.0
+    zero_padding: [2, 2]
+  optimizer:
+    learning_rate: 0.01
+  training:
+    epochs: 10000
+    batch_size: 512
+    validation_split: 0.1
+    shuffle: True
+    verbose: 2
 output_dir: /scratch/sgarcia/ddm/experiments/mnist/results

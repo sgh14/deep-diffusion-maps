@@ -8,10 +8,15 @@ diffusion_maps:
   alpha: 0
   steps: 1
 encoder:
-  units: 128
-  epochs: 2500
-  batch_size: 512
-  learning_rate: 0.01
-  validation_split: 0.1
-  batch_normalization: False
+  architecture:
+    units: 128
+    use_bn: False
+  optimizer:
+    learning_rate: 0.01
+  training:
+    epochs: 2500
+    batch_size: 512
+    validation_split: 0.1
+    shuffle: True
+    verbose: 2
 output_dir: /scratch/sgarcia/ddm/experiments/phoneme/results
