@@ -11,7 +11,7 @@ diffusion_maps:
 encoder:
   architecture:
     filters: 16
-    batch_normalization: False
+    use_bn: False
     dropout: 0.0
     zero_padding: [2, 2]
   optimizer:

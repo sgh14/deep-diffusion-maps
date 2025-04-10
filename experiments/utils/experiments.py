@@ -339,7 +339,4 @@ def save_results(results: Dict[str, Dict[str, Any]], hyperparameters: Dict[str, 
             for subset_name, subset_dict in group_dict.items():
                 file[group_name].create_group(subset_name)
                 for key, value in subset_dict.items():
-                    if hasattr(value, 'shape') and len(value) > 1:
-                        file[group_name][subset_name].create_dataset(key, data=value, compression='gzip')
-                    else:
-                        file[group_name][subset_name].create_dataset(key, data=value)
+                    file[group_name][subset_name].create_dataset(key, data=value)

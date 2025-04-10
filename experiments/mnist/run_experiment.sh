@@ -1,3 +1,4 @@
+#!/bin/sh
 # Activate your conda environment
 # source ~/miniconda3/bin/activate
 # conda activate ddm

@@ -10,7 +10,7 @@ diffusion_maps:
 encoder:
   architecture:
     units: 128
-    batch_normalization: False
+    use_bn: False
   optimizer:
     learning_rate: 0.01
   training:

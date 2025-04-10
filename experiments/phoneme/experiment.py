@@ -30,14 +30,13 @@ def main() -> None:
 
     # Load the data
     data = get_data(
-        npoints=config['data']['npoints'],
         split=config['data']['split'],
         seed=config['data']['seed'],
         noise=config['data']['noise']
     )
 
     # Calculate sigma parameter based on quantile if not explicitly provided
-    hyperparameters['sigma'] = get_sigma(data['train']['X'], hyperparameters['q'])
+    hyperparameters['sigma'] = get_sigma(data['train']['X'], hyperparameters['quantile'])
     
     # Run standard diffusion maps experiment
     dm_results = diffusion_maps_experiment(

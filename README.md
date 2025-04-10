@@ -142,7 +142,7 @@ diffusion_maps:
 encoder:
   architecture: # This section may change depending on the data type
     units: 128         # Number of units in the hidden layers
-    batch_normalization: False  # Whether to use batch normalization
+    use_bn: False  # Whether to use batch normalization
   optimizer:
     learning_rate: 0.01  # Learning rate for the optimizer
   training:

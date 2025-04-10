@@ -19,7 +19,7 @@ encoder:
   batch_size: 512
   learning_rate: 0.01
   validation_split: 0.1
-  batch_normalization: False
+  use_bn: False
   batch_size_scheduler:
     period: 1000
     increase_factor: 2
