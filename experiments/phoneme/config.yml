@@ -1,0 +1,22 @@
+data:
+  split: 0.222
+  noise: 0.0
+  seed: 123
+diffusion_maps:
+  n_components: 2
+  quantile: 5.0e-3
+  alpha: 0
+  steps: 1
+encoder:
+  architecture:
+    units: 128
+    use_bn: False
+  optimizer:
+    learning_rate: 0.01
+  training:
+    epochs: 2500
+    batch_size: 512
+    validation_split: 0.1
+    shuffle: True
+    verbose: 2
+output_dir: /scratch/sgarcia/ddm/experiments/phoneme/results

@@ -1,0 +1,25 @@
+data:
+  npoints: 5000
+  split: 0.1
+  noise: 0.0
+  seed: 123
+diffusion_maps:
+  n_components: 6
+  quantile: 5.0e-3
+  alpha: 0
+  steps: 1
+encoder:
+  architecture:
+    filters: 16
+    use_bn: False
+    dropout: 0.0
+    zero_padding: [2, 2]
+  optimizer:
+    learning_rate: 0.01
+  training:
+    epochs: 10000
+    batch_size: 512
+    validation_split: 0.1
+    shuffle: True
+    verbose: 2
+output_dir: /scratch/sgarcia/ddm/experiments/mnist/results
