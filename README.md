@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A novel implementation of diffusion maps using deep learning (neural networks). This repository contains the code for the experiments described in our paper [Paper Title].
+A novel implementation of diffusion maps using deep learning (neural networks). This repository contains the code for the experiments described in our [paper]().
 
 ## Overview
 
@@ -289,7 +289,7 @@ The experiments produce several outputs:
 
 ## References
 
-- Paper: [Paper Title]
+- Deep Diffusion Maps paper: []()
 - Diffusion Maps code implementation: [diffusion-maps-with-nystrom](https://github.com/sgh14/diffusion-maps-with-nystrom.git)
 - Original Diffusion Maps paper: Coifman, R. R., & Lafon, S. (2006). Diffusion maps. Applied and computational harmonic analysis, 21(1), 5-30.
 
